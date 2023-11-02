@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+### Ignore CMU Graphics ###
+cmu_graphics
+
+### macOS  ###
+.DS_Store
+
 # C extensions
 *.so
 
