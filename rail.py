@@ -9,13 +9,6 @@ class Rail:
         self.indices = indices
         self.directions = directions
 
-        if random.randrange(2) == 0:
-            self.directions.add("top")
-            self.directions.add("bottom")
-        else:
-            self.directions.add("left")
-            self.directions.add("right")
-
     def display(self, app):
         worldPos = self.toWorldPos(app)
 
@@ -26,6 +19,10 @@ class Rail:
         elif "left" in self.directions and "right" in self.directions:
             type = "Straight"
             angle = 90
+
+        if len(self.directions) >= 2:
+            type = "Multi"
+            angle = 0
 
         drawImage(
             app.imageDict[type],
@@ -43,7 +40,9 @@ class Rail:
 
         random.shuffle(choices)
         for drow, dcol in choices:
-            self.connect(app, self.indices[0] + drow, self.indices[1] + dcol, choice)
+            self.connect(
+                app, self.indices[0] + drow, self.indices[1] + dcol, (drow, dcol)
+            )
 
     def connect(self, app, row, col, dif):
         # out of bound cases
@@ -60,18 +59,23 @@ class Rail:
             self.directions.add("bottom")
             return
 
-        # inbound cases
+        # inbound case
         neverVisited = app.grids[row][col] == None
 
         # create new rail if not created
         if neverVisited:
             app.grids[row][col] = Rail(app, (row, col), set())
 
-        # determine if need to connect to this rail
-        # (always connect to newly created one to ensure all rails are connected
-        # otherwise use probability of connection in app)
+        # determine if need to connect to this rail based on following conditions:
+        # 1. always connect to newly created one to ensure all rails are connected
+        # 2. always make sure each rail has at least two ways
+        # 3. otherwise determine using probability of connection in app
 
-        if neverVisited or random.random() < app.probOfConnect:
+        if (
+            neverVisited
+            or len(self.directions) == 1
+            or random.random() < app.probOfConnect
+        ):
             self.connectToRail(app.grids[row][col], dif)
 
         # only flood fill if never visited
@@ -98,7 +102,8 @@ class Rail:
             app.unitY * (self.indices[0] + 0.5),
         )
 
-    # def inBound(indices):
+    # @staticmethod
+    # def inBound(app, indices):
     #     return (
     #         indices[0] >= 0
     #         and indices[0] < len(app.grids)

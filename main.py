@@ -11,14 +11,19 @@ def onAppStart(app):
     app.unitX = app.width / mapSize
     app.unitY = app.height / mapSize
 
-    app.probOfConnect = 0
+    app.probOfConnect = 0.25
 
     # for i in range(len(app.grids)):
     #     for j in range(len(app.grids[0])):
     #         app.grids[i][j] = Rail(app, (i, j), set())
 
-    app.grids[mapSize // 2][0] = Rail(app, (mapSize // 2, 0), set())
-    app.grids[mapSize // 2][0].floodFill(app)
+    app.grids[mapSize // 2][mapSize // 2] = Rail(
+        app, (mapSize // 2, mapSize // 2), set()
+    )
+    app.grids[mapSize // 2][mapSize // 2].floodFill(app)
+
+    # make sure this starting rail has at least two directions
+    app.grids[mapSize // 2][mapSize // 2].directions.add("left")
 
 
 def redrawAll(app):
@@ -26,7 +31,7 @@ def redrawAll(app):
     for i in range(len(app.grids)):
         for j in range(len(app.grids[0])):
             app.grids[i][j].display(app)
-            # print(app.grids[i][j].directions)
+            print(app.grids[i][j].directions)
 
 
 def main():
