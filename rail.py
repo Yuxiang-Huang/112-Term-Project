@@ -32,8 +32,8 @@ class Rail:
         self.directions = directions
 
     def display(self, app):
-        if len(self.directions) == 1:
-            return
+        # if len(self.directions) == 1:
+        #     return
 
         worldPos = self.toWorldPos(app)
 
@@ -57,6 +57,7 @@ class Rail:
             type = "Turn"
             angle = 270
 
+        # special case for clickable rails
         if len(self.directions) > 2:
             type = "Multi"
             angle = 0
@@ -73,14 +74,14 @@ class Rail:
         # drawLabel(self.indices, worldPos[0], worldPos[1])
 
     def floodFill(self, app, prevDirection):
-        choices = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-
-        random.shuffle(choices)
-
+        # bias to move straight
         if random.random() < map.Map.probOfStraight:
             dif = Rail.directionToDif[prevDirection]
             self.connect(app, dif)
 
+        # try all directions in random order
+        choices = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        random.shuffle(choices)
         for dif in choices:
             self.connect(app, dif)
 
@@ -89,35 +90,21 @@ class Rail:
         col = self.indices[1] + dif[1]
 
         # out of bound cases
-        if row < 0:
-            self.directions.add("left")
-            return
-        elif row >= len(app.map.rails):
-            self.directions.add("right")
-            return
-        if col < 0:
-            self.directions.add("top")
-            return
-        elif col >= len(app.map.rails[0]):
-            self.directions.add("bottom")
+        if not Rail.inBound(app, (row, col)):
             return
 
-        # inbound case
-        neverVisited = app.map.rails[row][col] == None
-
-        # create new rail if not created
-        if neverVisited:
+        # if never visited
+        if app.map.rails[row][col] == None:
+            # create new rail
             app.map.rails[row][col] = Rail(app, (row, col), set())
-
-        # determine if need to connect to this rail
-        # (always connect to newly created one to ensure all rails are connected
-        # otherwise determine using probability of connection in app)
-        if neverVisited or random.random() < map.Map.probOfConnect:
+            # connect to this rail to ensure that all rails are connected
             self.connectToRail(app.map.rails[row][col], dif)
-
-        # only flood fill if never visited
-        if neverVisited:
+            # flood fill the rest of the map
             app.map.rails[row][col].floodFill(app, Rail.difToDirection[dif])
+
+        # # determine using probability of connection if to connect to this rail)
+        # if random.random() < map.Map.probOfConnect:
+        #     self.connectToRail(app.map.rails[row][col], dif)
 
     def connectToRail(self, other, dif):
         # connect the two rails together using dif
@@ -128,8 +115,25 @@ class Rail:
         # connect to complement if only has one direction
         if len(self.directions) == 1:
             dif = Rail.directionToDif[Rail.directionComplement[min(self.directions)]]
-            other = app.map.rails[self.indices[0] + dif[0]][self.indices[1] + dif[1]]
-            self.connectToRail(other, dif)
+            otherIndices = (self.indices[0] + dif[0], self.indices[1] + dif[1])
+            # in bound and out of bound cases
+            if Rail.inBound(app, otherIndices):
+                other = app.map.rails[otherIndices[0]][otherIndices[1]]
+                self.connectToRail(other, dif)
+            else:
+                self.outOfBoundConnection(
+                    self.indices[0] + dif[0], self.indices[1] + dif[1]
+                )
+
+    def outOfBoundConnection(self, row, col):
+        if row < 0:
+            self.directions.add("top")
+        elif row >= len(app.map.rails):
+            self.directions.add("bottom")
+        if col < 0:
+            self.directions.add("left")
+        elif col >= len(app.map.rails[0]):
+            self.directions.add("right")
 
     def toWorldPos(self, app):
         return (
@@ -137,11 +141,14 @@ class Rail:
             app.unitY * (self.indices[0] + 0.5),
         )
 
-    # @staticmethod
-    # def inBound(app, indices):
-    #     return (
-    #         indices[0] >= 0
-    #         and indices[0] < len(app.map.rails)
-    #         and indices[1] >= 0
-    #         and indices[1] < len(app.map.rails[0])
-    #     )
+    def onPress(self):
+        print(self.directions)
+
+    @staticmethod
+    def inBound(app, indices):
+        return (
+            indices[0] >= 0
+            and indices[0] < len(app.map.rails)
+            and indices[1] >= 0
+            and indices[1] < len(app.map.rails[0])
+        )

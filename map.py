@@ -1,4 +1,5 @@
 import rail as railFile
+import math
 
 
 class Map:
@@ -27,3 +28,8 @@ class Map:
         for rowList in self.rails:
             for rail in rowList:
                 rail.optimize(app)
+
+    def findRail(self, app, mouseX, mouseY):
+        return self.rails[math.floor(mouseY / app.unitY)][
+            math.floor(mouseX / app.unitX)
+        ]
