@@ -20,10 +20,12 @@ def onAppStart(app):
     app.grids[mapSize // 2][mapSize // 2] = Rail(
         app, (mapSize // 2, mapSize // 2), set()
     )
-    app.grids[mapSize // 2][mapSize // 2].floodFill(app)
 
-    # make sure this starting rail has at least two directions
+    # make sure this starting rail will have a left direction
     app.grids[mapSize // 2][mapSize // 2].directions.add("left")
+
+    # flood fill to create map
+    app.grids[mapSize // 2][mapSize // 2].floodFill(app)
 
 
 def redrawAll(app):

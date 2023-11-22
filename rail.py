@@ -3,6 +3,20 @@ import random
 
 
 class Rail:
+    difToDirection = {
+        (-1, 0): "top",
+        (1, 0): "bottom",
+        (0, -1): "left",
+        (0, 1): "right",
+    }
+
+    directionToDif = {
+        "top": (-1, 0),
+        "bottom": (1, 0),
+        "left": (0, -1),
+        "right": (0, 1),
+    }
+
     def __init__(self, app, indices, directions):
         self.width = app.unitX
         self.height = app.unitY
@@ -70,7 +84,6 @@ class Rail:
         # 1. always connect to newly created one to ensure all rails are connected
         # 2. always make sure each rail has at least two ways
         # 3. otherwise determine using probability of connection in app
-
         if (
             neverVisited
             or len(self.directions) == 1
@@ -83,18 +96,22 @@ class Rail:
             app.grids[row][col].floodFill(app)
 
     def connectToRail(self, other, dif):
-        if dif == (1, 0):
-            self.directions.add("right")
-            other.directions.add("left")
-        elif dif == (-1, 0):
-            self.directions.add("left")
-            other.directions.add("right")
-        elif dif == (0, 1):
+        # connect the two rails together using dif
+        if Rail.difToDirection[dif] == "top":
             self.directions.add("top")
             other.directions.add("bottom")
-        elif dif == (0, -1):
+
+        elif Rail.difToDirection[dif] == "bottom":
             self.directions.add("bottom")
             other.directions.add("top")
+
+        elif Rail.difToDirection[dif] == "left":
+            self.directions.add("left")
+            other.directions.add("right")
+
+        elif Rail.difToDirection[dif] == "right":
+            self.directions.add("right")
+            other.directions.add("left")
 
     def toWorldPos(self, app):
         return (
