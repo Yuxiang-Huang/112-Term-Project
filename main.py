@@ -12,7 +12,7 @@ def onAppStart(app):
     app.unitY = app.height / mapSize
 
     app.probOfStraight = 0.5
-    app.probOfConnect = 0.25
+    app.probOfConnect = 0.0  # 5
 
     # for i in range(len(app.grids)):
     #     for j in range(len(app.grids[0])):
@@ -31,8 +31,9 @@ def redrawAll(app):
     drawRect(0, 0, app.width, app.height, fill="lightblue")
     for i in range(len(app.grids)):
         for j in range(len(app.grids[0])):
-            app.grids[i][j].display(app)
+            # if app.grids[i][j] != None:
             print(app.grids[i][j].directions)
+            app.grids[i][j].display(app)
 
 
 def main():

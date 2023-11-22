@@ -17,6 +17,13 @@ class Rail:
         "right": (0, 1),
     }
 
+    directionComplement = {
+        "top": "bottom",
+        "bottom": "top",
+        "left": "right",
+        "right": "left",
+    }
+
     def __init__(self, app, indices, directions):
         self.width = app.unitX
         self.height = app.unitY
@@ -24,19 +31,34 @@ class Rail:
         self.directions = directions
 
     def display(self, app):
+        if len(self.directions) == 1:
+            return
+
         worldPos = self.toWorldPos(app)
 
-        if len(self.directions) >= 2:
-            type = "Multi"
-            angle = 0
-
-        # determine type
+        # determine rail display dependo on connections
         if "top" in self.directions and "bottom" in self.directions:
             type = "Straight"
             angle = 0
         elif "left" in self.directions and "right" in self.directions:
             type = "Straight"
             angle = 90
+        elif "top" in self.directions and "left" in self.directions:
+            type = "Turn"
+            angle = 90
+        elif "top" in self.directions and "right" in self.directions:
+            type = "Turn"
+            angle = 180
+        elif "bottom" in self.directions and "left" in self.directions:
+            type = "Turn"
+            angle = 0
+        elif "bottom" in self.directions and "right" in self.directions:
+            type = "Turn"
+            angle = 270
+
+        if len(self.directions) > 2:
+            type = "Multi"
+            angle = 0
 
         drawImage(
             app.imageDict[type],
@@ -93,7 +115,7 @@ class Rail:
         # 3. otherwise determine using probability of connection in app
         if (
             neverVisited
-            or len(self.directions) == 1
+            # or len(self.directions) == 1
             or random.random() < app.probOfConnect
         ):
             self.connectToRail(app.grids[row][col], dif)
@@ -104,21 +126,8 @@ class Rail:
 
     def connectToRail(self, other, dif):
         # connect the two rails together using dif
-        if Rail.difToDirection[dif] == "top":
-            self.directions.add("top")
-            other.directions.add("bottom")
-
-        elif Rail.difToDirection[dif] == "bottom":
-            self.directions.add("bottom")
-            other.directions.add("top")
-
-        elif Rail.difToDirection[dif] == "left":
-            self.directions.add("left")
-            other.directions.add("right")
-
-        elif Rail.difToDirection[dif] == "right":
-            self.directions.add("right")
-            other.directions.add("left")
+        self.directions.add(Rail.difToDirection[dif])
+        other.directions.add(Rail.directionComplement[Rail.difToDirection[dif]])
 
     def toWorldPos(self, app):
         return (
