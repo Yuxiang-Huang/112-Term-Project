@@ -7,17 +7,18 @@ def onAppStart(app):
     imageManager.loadImages(app)
 
     mapSize = 15
-    app.grids = [[0] * mapSize for _ in range(mapSize)]
+    app.grids = [[None] * mapSize for _ in range(mapSize)]
     app.unitX = app.width / mapSize
     app.unitY = app.height / mapSize
 
-    # app.pSplit = 0.5
+    app.probOfConnect = 0
 
-    for i in range(len(app.grids)):
-        for j in range(len(app.grids[0])):
-            app.grids[i][j] = Rail(app, (i, j), set())
+    # for i in range(len(app.grids)):
+    #     for j in range(len(app.grids[0])):
+    #         app.grids[i][j] = Rail(app, (i, j), set())
 
-    # app.grids[0][0].createEdge(app)
+    app.grids[mapSize // 2][0] = Rail(app, (mapSize // 2, 0), set())
+    app.grids[mapSize // 2][0].floodFill(app)
 
 
 def redrawAll(app):
@@ -25,6 +26,7 @@ def redrawAll(app):
     for i in range(len(app.grids)):
         for j in range(len(app.grids[0])):
             app.grids[i][j].display(app)
+            # print(app.grids[i][j].directions)
 
 
 def main():
