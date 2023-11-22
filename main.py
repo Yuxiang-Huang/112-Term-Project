@@ -26,14 +26,18 @@ def onAppStart(app):
     # flood fill to create map
     app.grids[mapSize // 2][0].floodFill(app, "right")
 
+    for rowList in app.grids:
+        for rail in rowList:
+            rail.optimize(app)
+
 
 def redrawAll(app):
     drawRect(0, 0, app.width, app.height, fill="lightblue")
-    for i in range(len(app.grids)):
-        for j in range(len(app.grids[0])):
-            # if app.grids[i][j] != None:
-            print(app.grids[i][j].directions)
-            app.grids[i][j].display(app)
+    for rowList in app.grids:
+        for rail in rowList:
+            # if rail != None:
+            # print(rail.directions)
+            rail.display(app)
 
 
 def main():

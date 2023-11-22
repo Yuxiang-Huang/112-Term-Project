@@ -77,17 +77,16 @@ class Rail:
         random.shuffle(choices)
 
         if random.random() < app.probOfStraight:
-            curDif = Rail.directionToDif[prevDirection]
-            self.connect(
-                app, self.indices[0] + curDif[0], self.indices[1] + curDif[1], curDif
-            )
+            dif = Rail.directionToDif[prevDirection]
+            self.connect(app, dif)
 
-        for drow, dcol in choices:
-            self.connect(
-                app, self.indices[0] + drow, self.indices[1] + dcol, (drow, dcol)
-            )
+        for dif in choices:
+            self.connect(app, dif)
 
-    def connect(self, app, row, col, dif):
+    def connect(self, app, dif):
+        row = self.indices[0] + dif[0]
+        col = self.indices[1] + dif[1]
+
         # out of bound cases
         if row < 0:
             self.directions.add("left")
@@ -109,15 +108,10 @@ class Rail:
         if neverVisited:
             app.grids[row][col] = Rail(app, (row, col), set())
 
-        # determine if need to connect to this rail based on following conditions:
-        # 1. always connect to newly created one to ensure all rails are connected
-        # 2. always make sure each rail has at least two ways
-        # 3. otherwise determine using probability of connection in app
-        if (
-            neverVisited
-            # or len(self.directions) == 1
-            or random.random() < app.probOfConnect
-        ):
+        # determine if need to connect to this rail
+        # (always connect to newly created one to ensure all rails are connected
+        # otherwise determine using probability of connection in app)
+        if neverVisited or random.random() < app.probOfConnect:
             self.connectToRail(app.grids[row][col], dif)
 
         # only flood fill if never visited
@@ -128,6 +122,13 @@ class Rail:
         # connect the two rails together using dif
         self.directions.add(Rail.difToDirection[dif])
         other.directions.add(Rail.directionComplement[Rail.difToDirection[dif]])
+
+    def optimize(self, app):
+        # connect to complement if only has one direction
+        if len(self.directions) == 1:
+            dif = Rail.directionToDif[Rail.directionComplement[min(self.directions)]]
+            other = app.grids[self.indices[0] + dif[0]][self.indices[1] + dif[1]]
+            self.connectToRail(other, dif)
 
     def toWorldPos(self, app):
         return (
