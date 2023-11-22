@@ -26,6 +26,10 @@ class Rail:
     def display(self, app):
         worldPos = self.toWorldPos(app)
 
+        if len(self.directions) >= 2:
+            type = "Multi"
+            angle = 0
+
         # determine type
         if "top" in self.directions and "bottom" in self.directions:
             type = "Straight"
@@ -33,10 +37,6 @@ class Rail:
         elif "left" in self.directions and "right" in self.directions:
             type = "Straight"
             angle = 90
-
-        if len(self.directions) >= 2:
-            type = "Multi"
-            angle = 0
 
         drawImage(
             app.imageDict[type],
@@ -49,10 +49,17 @@ class Rail:
         )
         # drawLabel(self.indices, worldPos[0], worldPos[1])
 
-    def floodFill(self, app):
+    def floodFill(self, app, prevDirection):
         choices = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
         random.shuffle(choices)
+
+        if random.random() < app.probOfStraight:
+            curDif = Rail.directionToDif[prevDirection]
+            self.connect(
+                app, self.indices[0] + curDif[0], self.indices[1] + curDif[1], curDif
+            )
+
         for drow, dcol in choices:
             self.connect(
                 app, self.indices[0] + drow, self.indices[1] + dcol, (drow, dcol)
@@ -93,7 +100,7 @@ class Rail:
 
         # only flood fill if never visited
         if neverVisited:
-            app.grids[row][col].floodFill(app)
+            app.grids[row][col].floodFill(app, Rail.difToDirection[dif])
 
     def connectToRail(self, other, dif):
         # connect the two rails together using dif
