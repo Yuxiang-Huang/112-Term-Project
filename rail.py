@@ -1,5 +1,6 @@
 from cmu_graphics import *
 import random
+import map
 
 
 class Rail:
@@ -76,7 +77,7 @@ class Rail:
 
         random.shuffle(choices)
 
-        if random.random() < app.probOfStraight:
+        if random.random() < map.Map.probOfStraight:
             dif = Rail.directionToDif[prevDirection]
             self.connect(app, dif)
 
@@ -91,32 +92,32 @@ class Rail:
         if row < 0:
             self.directions.add("left")
             return
-        elif row >= len(app.grids):
+        elif row >= len(app.map.rails):
             self.directions.add("right")
             return
         if col < 0:
             self.directions.add("top")
             return
-        elif col >= len(app.grids[0]):
+        elif col >= len(app.map.rails[0]):
             self.directions.add("bottom")
             return
 
         # inbound case
-        neverVisited = app.grids[row][col] == None
+        neverVisited = app.map.rails[row][col] == None
 
         # create new rail if not created
         if neverVisited:
-            app.grids[row][col] = Rail(app, (row, col), set())
+            app.map.rails[row][col] = Rail(app, (row, col), set())
 
         # determine if need to connect to this rail
         # (always connect to newly created one to ensure all rails are connected
         # otherwise determine using probability of connection in app)
-        if neverVisited or random.random() < app.probOfConnect:
-            self.connectToRail(app.grids[row][col], dif)
+        if neverVisited or random.random() < map.Map.probOfConnect:
+            self.connectToRail(app.map.rails[row][col], dif)
 
         # only flood fill if never visited
         if neverVisited:
-            app.grids[row][col].floodFill(app, Rail.difToDirection[dif])
+            app.map.rails[row][col].floodFill(app, Rail.difToDirection[dif])
 
     def connectToRail(self, other, dif):
         # connect the two rails together using dif
@@ -127,7 +128,7 @@ class Rail:
         # connect to complement if only has one direction
         if len(self.directions) == 1:
             dif = Rail.directionToDif[Rail.directionComplement[min(self.directions)]]
-            other = app.grids[self.indices[0] + dif[0]][self.indices[1] + dif[1]]
+            other = app.map.rails[self.indices[0] + dif[0]][self.indices[1] + dif[1]]
             self.connectToRail(other, dif)
 
     def toWorldPos(self, app):
@@ -140,7 +141,7 @@ class Rail:
     # def inBound(app, indices):
     #     return (
     #         indices[0] >= 0
-    #         and indices[0] < len(app.grids)
+    #         and indices[0] < len(app.map.rails)
     #         and indices[1] >= 0
-    #         and indices[1] < len(app.grids[0])
+    #         and indices[1] < len(app.map.rails[0])
     #     )
