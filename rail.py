@@ -4,24 +4,37 @@ import random
 
 class Rail:
     def __init__(self, app, indices, directions):
-        self.indices = indices
-        self.directions = directions
-        if randrange(2) == 1:
-            self.type = "Straight"
-        else:
-            self.type = "Turn"
         self.width = app.unitX
         self.height = app.unitY
+        self.indices = indices
+        self.directions = directions
+
+        if random.randrange(2) == 0:
+            self.directions.add("top")
+            self.directions.add("bottom")
+        else:
+            self.directions.add("left")
+            self.directions.add("right")
 
     def display(self, app):
         worldPos = self.toWorldPos(app)
+
+        # determine type
+        if "top" in self.directions and "bottom" in self.directions:
+            type = "Straight"
+            angle = 0
+        elif "left" in self.directions and "right" in self.directions:
+            type = "Straight"
+            angle = 90
+
         drawImage(
-            app.imageDict[self.type],
+            app.imageDict[type],
             worldPos[0],
             worldPos[1],
             width=self.width,
             height=self.height,
             align="center",
+            rotateAngle=angle,
         )
         # drawLabel(self.indices,    worldPos[0], worldPos[1])
 

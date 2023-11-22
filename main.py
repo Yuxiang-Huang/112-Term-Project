@@ -15,13 +15,13 @@ def onAppStart(app):
 
     for i in range(len(app.grids)):
         for j in range(len(app.grids[0])):
-            app.grids[i][j] = Rail(app, (i, j), [])
+            app.grids[i][j] = Rail(app, (i, j), set())
 
     # app.grids[0][0].createEdge(app)
 
 
 def redrawAll(app):
-    drawRect(0, 0, app.width, app.height, fill="lightgreen")
+    drawRect(0, 0, app.width, app.height, fill="lightblue")
     for i in range(len(app.grids)):
         for j in range(len(app.grids[0])):
             app.grids[i][j].display(app)
