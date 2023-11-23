@@ -8,17 +8,10 @@ class Map:
     probOfConnect = 0  # 0.05
 
     allTypes = ["red", "green", "blue", "purple", "yellow", "orange"]
-    carSpeed = {
-        "red": 1,
-        "green": 2,
-        "blue": 3,
-        "purple": 4,
-        "yellow": 5,
-        "orange": 6,
-    }
 
     def __init__(self, allTypes):
         self.allTypes = allTypes
+        self.allCars = []
 
     def createMap(self, app, mapSize):
         # initlizations
@@ -66,6 +59,8 @@ class Map:
         for rowList in self.rails:
             for curRail in rowList:
                 curRail.display(app)
+        for car in self.allCars:
+            car.display()
 
     def findRail(self, app, mouseX, mouseY):
         return self.rails[math.floor(mouseY / app.unitY)][

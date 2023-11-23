@@ -1,6 +1,10 @@
+from car import *
+import random
+
+
 class SpawnManager:
     def __init__(self, spawnableRails):
-        self.count = 100
+        self.count = 100  # 0
         self.spawnableRails = spawnableRails
 
     def takeStep(self, app):
@@ -11,4 +15,8 @@ class SpawnManager:
             self.spawn(app)
 
     def spawn(self, app):
-        print("spawn")
+        spawnRail = random.choice(self.spawnableRails)
+        spawnType = random.choice(app.map.allTypes)
+        spawnCar = Car(app, spawnType, spawnRail)
+        spawnRail.car = spawnCar
+        app.map.allCars.append(spawnCar)
