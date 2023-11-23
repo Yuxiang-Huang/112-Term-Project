@@ -10,14 +10,12 @@ class Rail:
         (0, -1): "left",
         (0, 1): "right",
     }
-
     directionToDif = {
         "top": (-1, 0),
         "bottom": (1, 0),
         "left": (0, -1),
         "right": (0, 1),
     }
-
     directionComplement = {
         "top": "bottom",
         "bottom": "top",
@@ -73,6 +71,10 @@ class Rail:
         )
         # drawLabel(self.indices, worldPos[0], worldPos[1])
 
+    def onPress(self):
+        print(self.allDirections)
+
+    # region map generation
     def floodFill(self, app, prevDirection):
         # bias to move straight
         if random.random() < map.Map.probOfStraight:
@@ -125,6 +127,33 @@ class Rail:
                     self.indices[0] + dif[0], self.indices[1] + dif[1]
                 )
 
+        # create all directions
+        if len(self.directions) == 2:
+            self.allDirections = self.directions
+        else:
+            self.allDirections = []
+            # hard coded to be sorted...
+            if app.directionSort:
+                if "top" in self.directions and "bottom" in self.directions:
+                    self.allDirections.append({"top, bottom"})
+                if "left" in self.directions and "right" in self.directions:
+                    self.allDirections.append({"left, right"})
+                if "top" in self.directions and "left" in self.directions:
+                    self.allDirections.append({"top, left"})
+                if "top" in self.directions and "right" in self.directions:
+                    self.allDirections.append({"top, right"})
+                if "bottom" in self.directions and "right" in self.directions:
+                    self.allDirections.append({"bottom, right"})
+                if "bottom" in self.directions and "left" in self.directions:
+                    self.allDirections.append({"bottom, left"})
+            else:
+                for dir1 in self.directions:
+                    for dir2 in self.directions:
+                        curDir = {dir1, dir2}
+                        # not duplicate
+                        if len(curDir) == 2 and curDir not in self.allDirections:
+                            self.allDirections.append(curDir)
+
     def outOfBoundConnection(self, row, col):
         if row < 0:
             self.directions.add("top")
@@ -135,14 +164,14 @@ class Rail:
         elif col >= len(app.map.rails[0]):
             self.directions.add("right")
 
+    # endregion
+
+    # region helper functions
     def toWorldPos(self, app):
         return (
             app.unitX * (self.indices[1] + 0.5),
             app.unitY * (self.indices[0] + 0.5),
         )
-
-    def onPress(self):
-        print(self.directions)
 
     @staticmethod
     def inBound(app, indices):
@@ -152,3 +181,5 @@ class Rail:
             and indices[1] >= 0
             and indices[1] < len(app.map.rails[0])
         )
+
+    # endregion

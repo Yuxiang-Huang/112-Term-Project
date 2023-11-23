@@ -3,7 +3,7 @@ import math
 
 
 class Map:
-    probOfStraight = 0.25
+    probOfStraight = 0.1
     probOfConnect = 0  # 0.05
 
     # def __init__(self):
@@ -28,6 +28,11 @@ class Map:
         for rowList in self.rails:
             for rail in rowList:
                 rail.optimize(app)
+
+    def display(self, app):
+        for rowList in self.rails:
+            for curRail in rowList:
+                curRail.display(app)
 
     def findRail(self, app, mouseX, mouseY):
         return self.rails[math.floor(mouseY / app.unitY)][
