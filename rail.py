@@ -24,8 +24,7 @@ class Rail:
     }
 
     def __init__(self, app, indices, directions):
-        self.width = app.unitX
-        self.height = app.unitY
+        self.size = app.unitSize
         self.indices = indices
         self.directions = directions
         self.spawnCarDirection = None
@@ -64,8 +63,8 @@ class Rail:
             drawOval(
                 worldPos[0],
                 worldPos[1],
-                self.width,
-                self.height,
+                self.size,
+                self.size,
                 fill="lightyellow",
             )
 
@@ -73,8 +72,8 @@ class Rail:
             app.imageDict[type],
             worldPos[0],
             worldPos[1],
-            width=self.width,
-            height=self.height,
+            width=self.size,
+            height=self.size,
             align="center",
             rotateAngle=angle,
         )
@@ -204,8 +203,8 @@ class Rail:
     # region helper functions
     def toWorldPos(self, app):
         return (
-            app.unitX * (self.indices[1] + 0.5),
-            app.unitY * (self.indices[0] + 0.5),
+            app.unitSize * (self.indices[1] + 0.5),
+            app.unitSize * (self.indices[0] + 0.5),
         )
 
     @staticmethod

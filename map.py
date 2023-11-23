@@ -16,8 +16,7 @@ class Map:
     def createMap(self, app, mapSize):
         # initlizations
         self.rails = [[None] * mapSize for _ in range(mapSize)]
-        app.unitX = app.width / mapSize
-        app.unitY = app.height / mapSize
+        app.unitSize = app.width / mapSize
 
         spawnableRails = []
 
@@ -60,10 +59,10 @@ class Map:
             for curRail in rowList:
                 curRail.display(app)
         for car in self.allCars:
-            car.move(self)
+            car.move(app)
             car.display()
 
     def findRail(self, app, mouseX, mouseY):
-        return self.rails[math.floor(mouseY / app.unitY)][
-            math.floor(mouseX / app.unitX)
+        return self.rails[math.floor(mouseY / app.unitSize)][
+            math.floor(mouseX / app.unitSize)
         ]
