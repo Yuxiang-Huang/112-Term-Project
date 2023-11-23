@@ -7,8 +7,18 @@ class Map:
     probOfStraight = 0.1
     probOfConnect = 0  # 0.05
 
-    # def __init__(self):
-    #     pass
+    allTypes = ["red", "green", "blue", "purple", "yellow", "orange"]
+    carSpeed = {
+        "red": 1,
+        "green": 2,
+        "blue": 3,
+        "purple": 4,
+        "yellow": 5,
+        "orange": 6,
+    }
+
+    def __init__(self, allTypes):
+        self.allTypes = allTypes
 
     def createMap(self, app, mapSize):
         # initlizations
@@ -16,31 +26,41 @@ class Map:
         app.unitX = app.width / mapSize
         app.unitY = app.height / mapSize
 
-        self.spawnableRails = []
+        spawnableRails = []
 
-        # start with the  most middle left rail
+        # start with the most left center rail
         self.rails[mapSize // 2][0] = railFile.Rail(app, (mapSize // 2, 0), set())
 
         # flood fill to create map
         self.rails[mapSize // 2][0].floodFill(app, "right")
 
         # make sure this each side has a spawnable rail
-        self.rails[mapSize // 2][0].outOfBoundConnection(app, mapSize // 2, -1)
+        self.rails[mapSize // 2][0].outOfBoundConnection(
+            mapSize // 2, -1, spawnableRails
+        )
+
         randomIndex = random.randint(0, mapSize - 1)
-        self.rails[randomIndex][-1].outOfBoundConnection(app, randomIndex, mapSize)
+        self.rails[randomIndex][-1].outOfBoundConnection(
+            randomIndex, mapSize, spawnableRails
+        )
+
         randomIndex = random.randint(0, mapSize - 1)
-        self.rails[0][randomIndex].outOfBoundConnection(app, -1, randomIndex)
+        self.rails[0][randomIndex].outOfBoundConnection(-1, randomIndex, spawnableRails)
+
         randomIndex = random.randint(0, mapSize - 1)
-        self.rails[-1][randomIndex].outOfBoundConnection(app, mapSize, randomIndex)
+        self.rails[-1][randomIndex].outOfBoundConnection(
+            mapSize, randomIndex, spawnableRails
+        )
 
         # finalize
         for rowList in self.rails:
             for rail in rowList:
-                rail.fixOneDirectionRail(app)
-
+                rail.fixOneDirectionRail(app, spawnableRails)
         for rowList in self.rails:
             for rail in rowList:
                 rail.createAllDirections()
+
+        return spawnableRails
 
     def display(self, app):
         for rowList in self.rails:

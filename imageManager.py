@@ -9,7 +9,6 @@ def loadImages(app):
     app.imageDict = {
         "Straight": "Images/StraightRail.png",
         "Turn": "Images/TurnRail.png",
-        "Multi": "Images/MultiRail.png",
     }
 
     for imgName in app.imageDict:

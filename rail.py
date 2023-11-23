@@ -124,7 +124,7 @@ class Rail:
         self.directions.add(Rail.difToDirection[dif])
         other.directions.add(Rail.directionComplement[Rail.difToDirection[dif]])
 
-    def fixOneDirectionRail(self, app):
+    def fixOneDirectionRail(self, app, spawnableRails):
         # connect to complement if only has one direction
         if len(self.directions) == 1:
             dif = Rail.directionToDif[Rail.directionComplement[min(self.directions)]]
@@ -135,7 +135,7 @@ class Rail:
                 self.connectToRail(other, dif)
             else:
                 self.outOfBoundConnection(
-                    app, self.indices[0] + dif[0], self.indices[1] + dif[1]
+                    self.indices[0] + dif[0], self.indices[1] + dif[1], spawnableRails
                 )
 
     def createAllDirections(self):
@@ -181,23 +181,23 @@ class Rail:
         self.dirIndex = 0
         self.directions = self.allDirections[self.dirIndex]
 
-    def outOfBoundConnection(self, app, row, col):
+    def outOfBoundConnection(self, row, col, spawnableRails):
         if row < 0:
             self.directions.add("top")
             self.spawnCarDirection = "top"
-            app.map.spawnableRails.append(self)
+            spawnableRails.append(self)
         elif row >= len(app.map.rails):
             self.directions.add("bottom")
             self.spawnCarDirection = "bottom"
-            app.map.spawnableRails.append(self)
+            spawnableRails.append(self)
         if col < 0:
             self.directions.add("left")
             self.spawnCarDirection = "left"
-            app.map.spawnableRails.append(self)
+            spawnableRails.append(self)
         elif col >= len(app.map.rails[0]):
             self.directions.add("right")
             self.spawnCarDirection = "right"
-            app.map.spawnableRails.append(self)
+            spawnableRails.append(self)
 
     # endregion
 

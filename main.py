@@ -1,17 +1,20 @@
 from cmu_graphics import *
 import imageManager
 from map import *
+from spawnManager import *
 
 
 def onAppStart(app):
     imageManager.loadImages(app)
 
     # setting
+    app.paused = False
     app.directionSort = True
     mapSize = 15
 
-    app.map = Map()
-    app.map.createMap(app, mapSize)
+    app.map = Map(Map.allTypes)
+    spawnableRails = app.map.createMap(app, mapSize)
+    app.spawnManager = SpawnManager(spawnableRails)
 
 
 def redrawAll(app):
@@ -21,6 +24,13 @@ def redrawAll(app):
 
 def onMousePress(app, mouseX, mouseY):
     app.map.findRail(app, mouseX, mouseY).onPress()
+
+
+def onStep(app):
+    if app.paused:
+        return
+
+    app.spawnManager.takeStep(app)
 
 
 def main():
