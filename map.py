@@ -60,6 +60,7 @@ class Map:
             for curRail in rowList:
                 curRail.display(app)
         for car in self.allCars:
+            car.move(self)
             car.display()
 
     def findRail(self, app, mouseX, mouseY):

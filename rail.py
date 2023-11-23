@@ -142,7 +142,7 @@ class Rail:
         # create all directions
         if len(self.directions) == 2:
             curDirectionList = list(self.directions)
-            self.allDirections = [(curDirectionList[0], curDirectionList[1])]
+            self.allDirections = [{curDirectionList[0], curDirectionList[1]}]
         else:
             self.allDirections = []
             # hard coded to be sorted...

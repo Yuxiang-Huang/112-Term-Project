@@ -11,6 +11,7 @@ def onAppStart(app):
     app.paused = False
     app.directionSort = True
     mapSize = 15
+    app.spawnTime = 100
 
     app.map = Map(Map.allTypes)
     spawnableRails = app.map.createMap(app, mapSize)
