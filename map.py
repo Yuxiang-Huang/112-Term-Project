@@ -24,10 +24,14 @@ class Map:
         # flood fill to create map
         self.rails[mapSize // 2][0].floodFill(app, "right")
 
-        # optimization process
+        # finalize
         for rowList in self.rails:
             for rail in rowList:
-                rail.optimize(app)
+                rail.fixOneDirectionRail(app)
+
+        for rowList in self.rails:
+            for rail in rowList:
+                rail.createAllDirections()
 
     def display(self, app):
         for rowList in self.rails:

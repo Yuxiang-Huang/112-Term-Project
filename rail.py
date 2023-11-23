@@ -29,6 +29,9 @@ class Rail:
         self.indices = indices
         self.directions = directions
 
+    def __repr__(self):
+        return f"Pos: {self.indices}, Dir: {self.allDirections}"
+
     def display(self, app):
         # if len(self.directions) == 1:
         #     return
@@ -56,9 +59,14 @@ class Rail:
             angle = 270
 
         # special case for clickable rails
-        if len(self.directions) > 2:
-            type = "Multi"
-            angle = 0
+        if len(self.allDirections) > 2:
+            drawOval(
+                worldPos[0],
+                worldPos[1],
+                self.width,
+                self.height,
+                fill="lightyellow",
+            )
 
         drawImage(
             app.imageDict[type],
@@ -72,7 +80,9 @@ class Rail:
         # drawLabel(self.indices, worldPos[0], worldPos[1])
 
     def onPress(self):
-        print(self.allDirections)
+        if len(self.allDirections) > 2:
+            self.dirIndex = (self.dirIndex + 1) % len(self.allDirections)
+            self.directions = self.allDirections[self.dirIndex]
 
     # region map generation
     def floodFill(self, app, prevDirection):
@@ -104,16 +114,16 @@ class Rail:
             # flood fill the rest of the map
             app.map.rails[row][col].floodFill(app, Rail.difToDirection[dif])
 
-        # # determine using probability of connection if to connect to this rail)
-        # if random.random() < map.Map.probOfConnect:
-        #     self.connectToRail(app.map.rails[row][col], dif)
+        # determine using probability of connection if to connect to this rail)
+        if random.random() < map.Map.probOfConnect:
+            self.connectToRail(app.map.rails[row][col], dif)
 
     def connectToRail(self, other, dif):
         # connect the two rails together using dif
         self.directions.add(Rail.difToDirection[dif])
         other.directions.add(Rail.directionComplement[Rail.difToDirection[dif]])
 
-    def optimize(self, app):
+    def fixOneDirectionRail(self, app):
         # connect to complement if only has one direction
         if len(self.directions) == 1:
             dif = Rail.directionToDif[Rail.directionComplement[min(self.directions)]]
@@ -127,6 +137,7 @@ class Rail:
                     self.indices[0] + dif[0], self.indices[1] + dif[1]
                 )
 
+    def createAllDirections(self):
         # create all directions
         if len(self.directions) == 2:
             self.allDirections = self.directions
@@ -135,24 +146,29 @@ class Rail:
             # hard coded to be sorted...
             if app.directionSort:
                 if "top" in self.directions and "bottom" in self.directions:
-                    self.allDirections.append({"top, bottom"})
+                    self.allDirections.append({"top", "bottom"})
                 if "left" in self.directions and "right" in self.directions:
-                    self.allDirections.append({"left, right"})
+                    self.allDirections.append({"left", "right"})
                 if "top" in self.directions and "left" in self.directions:
-                    self.allDirections.append({"top, left"})
+                    self.allDirections.append({"top", "left"})
                 if "top" in self.directions and "right" in self.directions:
-                    self.allDirections.append({"top, right"})
+                    self.allDirections.append({"top", "right"})
                 if "bottom" in self.directions and "right" in self.directions:
-                    self.allDirections.append({"bottom, right"})
+                    self.allDirections.append({"bottom", "right"})
                 if "bottom" in self.directions and "left" in self.directions:
-                    self.allDirections.append({"bottom, left"})
+                    self.allDirections.append({"bottom", "left"})
             else:
+                # random directions
                 for dir1 in self.directions:
                     for dir2 in self.directions:
                         curDir = {dir1, dir2}
-                        # not duplicate
+                        # check for duplicates
                         if len(curDir) == 2 and curDir not in self.allDirections:
                             self.allDirections.append(curDir)
+
+            # set direction for rail
+            self.dirIndex = 0
+            self.directions = self.allDirections[self.dirIndex]
 
     def outOfBoundConnection(self, row, col):
         if row < 0:
