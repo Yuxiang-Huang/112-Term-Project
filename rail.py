@@ -60,7 +60,7 @@ class Rail:
             angle = 270
 
         # special case for clickable rails
-        if len(self.allDirections) > 2:
+        if len(self.allDirections) > 1:
             drawOval(
                 worldPos[0],
                 worldPos[1],
@@ -81,7 +81,7 @@ class Rail:
         # drawLabel(self.indices, worldPos[0], worldPos[1])
 
     def onPress(self):
-        if len(self.allDirections) > 2:
+        if len(self.allDirections) > 1:
             self.dirIndex = (self.dirIndex + 1) % len(self.allDirections)
             self.directions = self.allDirections[self.dirIndex]
 
@@ -141,7 +141,8 @@ class Rail:
     def createAllDirections(self):
         # create all directions
         if len(self.directions) == 2:
-            self.allDirections = self.directions
+            curDirectionList = list(self.directions)
+            self.allDirections = [(curDirectionList[0], curDirectionList[1])]
         else:
             self.allDirections = []
             # hard coded to be sorted...
@@ -176,9 +177,9 @@ class Rail:
                         self.allDirections.remove(curDirection)
                     index -= 1
 
-            # set direction for rail
-            self.dirIndex = 0
-            self.directions = self.allDirections[self.dirIndex]
+        # set direction for rail
+        self.dirIndex = 0
+        self.directions = self.allDirections[self.dirIndex]
 
     def outOfBoundConnection(self, app, row, col):
         if row < 0:
