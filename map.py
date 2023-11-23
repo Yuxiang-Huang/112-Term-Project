@@ -1,5 +1,6 @@
 import rail as railFile
 import math
+import random
 
 
 class Map:
@@ -15,14 +16,22 @@ class Map:
         app.unitX = app.width / mapSize
         app.unitY = app.height / mapSize
 
+        self.spawnableRails = []
+
         # start with the  most middle left rail
         self.rails[mapSize // 2][0] = railFile.Rail(app, (mapSize // 2, 0), set())
 
-        # make sure this starting rail will have a left direction
-        self.rails[mapSize // 2][0].directions.add("left")
-
         # flood fill to create map
         self.rails[mapSize // 2][0].floodFill(app, "right")
+
+        # make sure this each side has a spawnable rail
+        self.rails[mapSize // 2][0].outOfBoundConnection(app, mapSize // 2, -1)
+        randomIndex = random.randint(0, mapSize - 1)
+        self.rails[randomIndex][-1].outOfBoundConnection(app, randomIndex, mapSize)
+        randomIndex = random.randint(0, mapSize - 1)
+        self.rails[0][randomIndex].outOfBoundConnection(app, -1, randomIndex)
+        randomIndex = random.randint(0, mapSize - 1)
+        self.rails[-1][randomIndex].outOfBoundConnection(app, mapSize, randomIndex)
 
         # finalize
         for rowList in self.rails:

@@ -7,7 +7,7 @@ def onAppStart(app):
     imageManager.loadImages(app)
 
     # setting
-    app.directionSort = False
+    app.directionSort = True
     mapSize = 15
 
     app.map = Map()

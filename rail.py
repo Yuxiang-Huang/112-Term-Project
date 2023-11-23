@@ -28,6 +28,7 @@ class Rail:
         self.height = app.unitY
         self.indices = indices
         self.directions = directions
+        self.spawnCarDirection = None
 
     def __repr__(self):
         return f"Pos: {self.indices}, Dir: {self.allDirections}"
@@ -134,7 +135,7 @@ class Rail:
                 self.connectToRail(other, dif)
             else:
                 self.outOfBoundConnection(
-                    self.indices[0] + dif[0], self.indices[1] + dif[1]
+                    app, self.indices[0] + dif[0], self.indices[1] + dif[1]
                 )
 
     def createAllDirections(self):
@@ -166,19 +167,36 @@ class Rail:
                         if len(curDir) == 2 and curDir not in self.allDirections:
                             self.allDirections.append(curDir)
 
+            # make sure spawnable rails stays spawnable
+            if self.spawnCarDirection != None:
+                index = len(self.allDirections) - 1
+                while index >= 0:
+                    curDirection = self.allDirections[index]
+                    if self.spawnCarDirection not in curDirection:
+                        self.allDirections.remove(curDirection)
+                    index -= 1
+
             # set direction for rail
             self.dirIndex = 0
             self.directions = self.allDirections[self.dirIndex]
 
-    def outOfBoundConnection(self, row, col):
+    def outOfBoundConnection(self, app, row, col):
         if row < 0:
             self.directions.add("top")
+            self.spawnCarDirection = "top"
+            app.map.spawnableRails.append(self)
         elif row >= len(app.map.rails):
             self.directions.add("bottom")
+            self.spawnCarDirection = "bottom"
+            app.map.spawnableRails.append(self)
         if col < 0:
             self.directions.add("left")
+            self.spawnCarDirection = "left"
+            app.map.spawnableRails.append(self)
         elif col >= len(app.map.rails[0]):
             self.directions.add("right")
+            self.spawnCarDirection = "right"
+            app.map.spawnableRails.append(self)
 
     # endregion
 
