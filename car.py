@@ -59,30 +59,65 @@ class Car:
         # endregion
         # region turn cases
         else:
-            if self.movingFrom == "left" or self.movingTo == "right":
-                xDir = 1
-            elif self.movingFrom == "right" or self.movingTo == "left":
-                xDir = -1
+            if self.movingFrom == "left" and self.movingTo == "top":
+                dx = -app.unitSize / 2
+                dy = -app.unitSize / 2
+                theta = math.pi * 3 / 2
+            elif self.movingFrom == "top" and self.movingTo == "left":
+                dx = -app.unitSize / 2
+                dy = -app.unitSize / 2
+                theta = 0
+                ratio *= -1
 
-            if self.movingFrom == "top" or self.movingTo == "bottom":
-                yDir = -1
-            elif self.movingFrom == "bottom" or self.movingTo == "top":
-                yDir = 1
+            elif self.movingFrom == "right" and self.movingTo == "top":
+                dx = app.unitSize / 2
+                dy = -app.unitSize / 2
+                theta = math.pi * 3 / 2
+                ratio *= -1
+            elif self.movingFrom == "top" and self.movingTo == "right":
+                dx = app.unitSize / 2
+                dy = -app.unitSize / 2
+                theta = math.pi
+
+            elif self.movingFrom == "left" and self.movingTo == "bottom":
+                dx = -app.unitSize / 2
+                dy = app.unitSize / 2
+                theta = math.pi / 2
+                ratio *= -1
+            elif self.movingFrom == "bottom" and self.movingTo == "left":
+                dx = -app.unitSize / 2
+                dy = app.unitSize / 2
+                theta = 0
+
+            elif self.movingFrom == "right" and self.movingTo == "bottom":
+                dx = app.unitSize / 2
+                dy = app.unitSize / 2
+                theta = math.pi / 2
+            elif self.movingFrom == "bottom" and self.movingTo == "right":
+                dx = app.unitSize / 2
+                dy = app.unitSize / 2
+                theta = math.pi
+                ratio *= -1
 
             self.pos = (
-                railPos[0] + math.cos(ratio * math.pi / 2) * xDir * app.unitSize / 2,
-                railPos[1] + math.sin(ratio * math.pi / 2) * yDir * app.unitSize / 2,
+                railPos[0]
+                + dx
+                + math.cos(theta + ratio * math.pi / 2) * app.unitSize / 2,
+                railPos[1]
+                + dy
+                - math.sin(theta + ratio * math.pi / 2) * app.unitSize / 2,
             )
         # endregion
         # endregion
 
         # animate time between tracks
-        if self.animationCount < app.stepsPerSecond / app.speedFactor:
-            self.animationCount += self.speed
-        else:
+        self.animationCount += self.speed
+        if self.animationCount > app.stepsPerSecond / app.speedFactor:
             # possibly can't change rail when not connected
             if self.changeRail(app.map):
-                self.animationCount = 0
+                self.animationCount -= app.stepsPerSecond / app.speedFactor
+            else:
+                self.animationCount -= self.speed
 
     def changeRail(self, map):
         # only can change when next rail is connected to current rail
