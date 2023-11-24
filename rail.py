@@ -107,7 +107,7 @@ class Rail:
         col = self.indices[1] + dif[1]
 
         # out of bound cases
-        if not Rail.inBound(app, (row, col)):
+        if not Rail.inBound(app.map, (row, col)):
             return
 
         # if never visited
@@ -134,7 +134,7 @@ class Rail:
             dif = Rail.directionToDif[Rail.directionComplement[min(self.directions)]]
             otherIndices = (self.indices[0] + dif[0], self.indices[1] + dif[1])
             # in bound and out of bound cases
-            if Rail.inBound(app, otherIndices):
+            if Rail.inBound(app.map, otherIndices):
                 other = app.map.rails[otherIndices[0]][otherIndices[1]]
                 self.connectToRail(other, dif)
             else:
@@ -213,12 +213,12 @@ class Rail:
         )
 
     @staticmethod
-    def inBound(app, indices):
+    def inBound(map, indices):
         return (
             indices[0] >= 0
-            and indices[0] < len(app.map.rails)
+            and indices[0] < len(map.rails)
             and indices[1] >= 0
-            and indices[1] < len(app.map.rails[0])
+            and indices[1] < len(map.rails[0])
         )
 
     # endregion

@@ -18,7 +18,7 @@ class Map:
         self.rails = [[None] * mapSize for _ in range(mapSize)]
         app.unitSize = app.width / mapSize
 
-        spawnableRails = []
+        self.spawnableRails = []
 
         # start with the most left center rail
         self.rails[mapSize // 2][0] = railFile.Rail(app, (mapSize // 2, 0), set())
@@ -28,31 +28,31 @@ class Map:
 
         # make sure this each side has a spawnable rail
         self.rails[mapSize // 2][0].outOfBoundConnection(
-            mapSize // 2, -1, spawnableRails
+            mapSize // 2, -1, self.spawnableRails
         )
 
         randomIndex = random.randint(0, mapSize - 1)
         self.rails[randomIndex][-1].outOfBoundConnection(
-            randomIndex, mapSize, spawnableRails
+            randomIndex, mapSize, self.spawnableRails
         )
 
         randomIndex = random.randint(0, mapSize - 1)
-        self.rails[0][randomIndex].outOfBoundConnection(-1, randomIndex, spawnableRails)
+        self.rails[0][randomIndex].outOfBoundConnection(
+            -1, randomIndex, self.spawnableRails
+        )
 
         randomIndex = random.randint(0, mapSize - 1)
         self.rails[-1][randomIndex].outOfBoundConnection(
-            mapSize, randomIndex, spawnableRails
+            mapSize, randomIndex, self.spawnableRails
         )
 
         # finalize
         for rowList in self.rails:
             for rail in rowList:
-                rail.fixOneDirectionRail(app, spawnableRails)
+                rail.fixOneDirectionRail(app, self.spawnableRails)
         for rowList in self.rails:
             for rail in rowList:
                 rail.createAllDirections()
-
-        return spawnableRails
 
     def display(self, app):
         for rowList in self.rails:

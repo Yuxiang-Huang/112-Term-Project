@@ -23,8 +23,7 @@ class Car:
         self.rail = None
 
         # pretend there is a straight rail connect to the spawn rail
-        self.movingFrom = spawnRail.spawnCarDirection
-        self.movingTo = Rail.directionComplement[self.movingFrom]
+        self.movingTo = Rail.directionComplement[spawnRail.spawnCarDirection]
         self.nextRail = spawnRail
         self.changeRail(app.map)
 
@@ -121,9 +120,14 @@ class Car:
                 self.animationCount -= self.speed
 
     def changeRail(self, map):
-        # only can change when next rail is connected to current rail
-        if Rail.directionComplement[self.movingTo] not in self.nextRail.directions:
-            return False
+        # if out of bound then teleport this car to a random spawnable
+        if self.nextRail == None:
+            self.nextRail = random.choice(map.spawnableRails)
+            self.movingTo = Rail.directionComplement[self.nextRail.spawnCarDirection]
+        else:
+            # only can change when next rail is connected to current rail
+            if Rail.directionComplement[self.movingTo] not in self.nextRail.directions:
+                return False
 
         # moving from is the opposite of moving to
         self.movingFrom = Rail.directionComplement[self.movingTo]
@@ -142,4 +146,10 @@ class Car:
         # using moving to to calculate rail
         dif = Rail.directionToDif[self.movingTo]
         curIndices = self.rail.indices
-        return map.rails[curIndices[0] + dif[0]][curIndices[1] + dif[1]]
+        curIndices = (curIndices[0] + dif[0], curIndices[1] + dif[1])
+
+        # check for out of bound
+        if Rail.inBound(map, curIndices):
+            return map.rails[curIndices[0]][curIndices[1]]
+        else:
+            return None

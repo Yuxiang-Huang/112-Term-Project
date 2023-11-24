@@ -15,8 +15,8 @@ def onAppStart(app):
     app.speedFactor = 5
 
     app.map = Map(Map.allTypes)
-    spawnableRails = app.map.createMap(app, mapSize)
-    app.spawnManager = SpawnManager(spawnableRails)
+    app.map.createMap(app, mapSize)
+    app.spawnManager = SpawnManager(app.map.spawnableRails)
 
 
 def redrawAll(app):
