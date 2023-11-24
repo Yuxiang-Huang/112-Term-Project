@@ -19,7 +19,6 @@ class Car:
         # change size according to type later
         self.size = app.unitSize / 4  # * (6 - self.speed / 2 + 1) / 6
         self.animationCount = 0
-
         self.rail = None
 
         # pretend there is a straight rail connect to the spawn rail
@@ -56,7 +55,7 @@ class Car:
                 railPos[1] + app.unitSize / 2 - app.unitSize * ratio,
             )
         # endregion
-        # region turn cases
+        # turn cases
         else:
             # hard coded conditions for circular motion...
             if self.movingFrom == "left" and self.movingTo == "top":
@@ -108,7 +107,6 @@ class Car:
                 - math.sin(theta + ratio * math.pi / 2) * app.unitSize / 2,
             )
         # endregion
-        # endregion
 
         # animate time between tracks
         self.animationCount += self.speed
@@ -117,10 +115,10 @@ class Car:
             if self.changeRail(app.map):
                 self.animationCount -= app.stepsPerSecond / app.speedFactor
             else:
-                self.animationCount -= self.speed
+                self.animationCount = app.stepsPerSecond / app.speedFactor
 
     def changeRail(self, map):
-        # if out of bound then teleport this car to a random spawnable
+        # if out of bound then teleport this car to a random spawnable rail
         if self.nextRail == None:
             self.nextRail = random.choice(map.spawnableRails)
             self.movingTo = Rail.directionComplement[self.nextRail.spawnCarDirection]
