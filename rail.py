@@ -28,6 +28,7 @@ class Rail:
         self.indices = indices
         self.directions = directions
         self.spawnCarDirection = None
+        self.car = None
 
     def __repr__(self):
         return f"Pos: {self.indices}, Dir: {self.allDirections}"
@@ -79,9 +80,13 @@ class Rail:
         )
         # drawLabel(self.indices, worldPos[0], worldPos[1])
 
-    def onPress(self):
-        if len(self.allDirections) > 1:
-            self.dirIndex = (self.dirIndex + 1) % len(self.allDirections)
+    def onPress(self, button):
+        if len(self.allDirections) > 1 and self.car == None:
+            if button == 0:
+                self.dirIndex += 1
+            else:
+                self.dirIndex -= 1
+            self.dirIndex %= len(self.allDirections)
             self.directions = self.allDirections[self.dirIndex]
 
     # region map generation

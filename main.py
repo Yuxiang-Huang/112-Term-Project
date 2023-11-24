@@ -11,7 +11,7 @@ def onAppStart(app):
     app.paused = False
     app.directionSort = True
     mapSize = 15
-    app.spawnTime = 100
+    app.spawnTime = 1
     app.speedFactor = 5
 
     app.map = Map(Map.allTypes)
@@ -24,8 +24,8 @@ def redrawAll(app):
     app.map.display(app)
 
 
-def onMousePress(app, mouseX, mouseY):
-    app.map.findRail(app, mouseX, mouseY).onPress()
+def onMousePress(app, mouseX, mouseY, button):
+    app.map.findRail(app, mouseX, mouseY).onPress(button)
 
 
 def onStep(app):

@@ -59,6 +59,7 @@ class Car:
         # endregion
         # region turn cases
         else:
+            # hard coded conditions for circular motion...
             if self.movingFrom == "left" and self.movingTo == "top":
                 dx = -app.unitSize / 2
                 dy = -app.unitSize / 2
@@ -130,11 +131,11 @@ class Car:
         if self.rail != None:
             self.rail.car = None
         self.rail = self.nextRail
+        self.rail.car = self
         # moving to is the other direction of this rail
         self.movingTo = (self.rail.directions - {self.movingFrom}).pop()
         # calculate next rail
         self.nextRail = self.calculateNextRail(map)
-        self.nextRail.car = self
         return True
 
     def calculateNextRail(self, map):
