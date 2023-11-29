@@ -9,12 +9,26 @@ class Map:
 
     minDifBtwDestination = 3
 
-    allTypes = ["red", "green", "blue", "purple", "yellow", "orange"]
+    allTypes = ["purple", "blue", "green", "yellow", "orange", "red"]
 
     def __init__(self, allTypes):
         self.allTypes = allTypes
         self.allCars = []
         self.allDestinations = []
+
+    def update(self, app):
+        for car in self.allCars:
+            car.move(app)
+            car.checkDestination()
+
+    def display(self, app):
+        for rowList in self.rails:
+            for curRail in rowList:
+                curRail.display(app)
+        for car in self.allCars:
+            car.display()
+        for destination in self.allDestinations:
+            destination.display(app)
 
     def createMap(self, app, mapSize):
         # initlizations
@@ -61,21 +75,6 @@ class Map:
         # create destinations
         self.createDestinations(app, mapSize)
 
-    def display(self, app):
-        for rowList in self.rails:
-            for curRail in rowList:
-                curRail.display(app)
-        for car in self.allCars:
-            car.move(app)
-            car.display()
-        for destination in self.allDestinations:
-            destination.display(app)
-
-    def findRail(self, app, mouseX, mouseY):
-        return self.rails[math.floor(mouseY / app.unitSize)][
-            math.floor(mouseX / app.unitSize)
-        ]
-
     def createDestinations(self, app, mapSize):
         # for each type
         for type in self.allTypes:
@@ -91,12 +90,17 @@ class Map:
                     curRail = self.rails[randomRow][randomCol]
                 self.allDestinations.extend(curRail.destinationList)
 
+    def findRail(self, app, mouseX, mouseY):
+        return self.rails[math.floor((mouseY - app.height + app.width) / app.unitSize)][
+            math.floor(mouseX / app.unitSize)
+        ]
+
     # region helper functions
     @staticmethod
     def toWorldPos(indices, app):
         return (
             app.unitSize * (indices[1] + 0.5),
-            app.unitSize * (indices[0] + 0.5),
+            app.unitSize * (indices[0] + 0.5) + app.height - app.width,
         )
 
     @staticmethod

@@ -6,12 +6,12 @@ import math
 
 class Car:
     carSpeed = {
-        "red": 0.5,
-        "green": 1,
-        "blue": 1.5,
-        "purple": 2,
-        "yellow": 2.5,
-        "orange": 3,
+        "purple": 0.5,
+        "blue": 1,
+        "green": 1.5,
+        "yellow": 2,
+        "orange": 2.5,
+        "red": 3,
     }
 
     def __init__(self, app, spawnType, spawnRail):
@@ -26,6 +26,9 @@ class Car:
         self.movingTo = Rail.directionComplement[spawnRail.spawnCarDirection]
         self.nextRail = spawnRail
         self.changeRail(app.map)
+
+    def checkDestination(self):
+        pass
 
     def display(self):
         drawCircle(self.pos[0], self.pos[1], self.size, fill=self.type)

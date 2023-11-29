@@ -279,10 +279,10 @@ class Rail:
                 return True
         return False
 
-    # endregion
-
     def neighborRail(self, map, direction):
         dif = Rail.directionToDif[direction]
         newIndices = (self.indices[0] + dif[0], self.indices[1] + dif[1])
         if mapFile.Map.inBound(map, newIndices):
             return map.rails[newIndices[0]][newIndices[1]]
+
+    # endregion

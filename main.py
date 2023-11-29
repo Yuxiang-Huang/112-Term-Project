@@ -15,13 +15,23 @@ def onAppStart(app):
     app.speedFactor = 5
     app.destinationRatio = 3
 
-    app.map = Map(Map.allTypes)
+    app.points = 0
+
+    app.map = Map(["blue", "green", "yellow"])
     app.map.createMap(app, mapSize)
     app.spawnManager = SpawnManager(app.map.spawnableRails)
 
 
 def redrawAll(app):
     drawRect(0, 0, app.width, app.height, fill="lightblue")
+
+    # top bar display
+    topBarHeight = app.height - app.width
+    drawRect(0, 0, app.width, topBarHeight)
+    drawLabel(
+        f"Points: {app.points}", app.width / 2, topBarHeight / 2, size=24, fill="white"
+    )
+
     app.map.display(app)
 
 
@@ -34,10 +44,11 @@ def onStep(app):
         return
 
     app.spawnManager.takeStep(app)
+    app.map.update(app)
 
 
 def main():
-    runApp(750, 750)
+    runApp(700, 750)
 
 
 main()
