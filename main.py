@@ -11,7 +11,7 @@ def onAppStart(app):
     app.paused = False
     app.directionSort = True
     mapSize = 15
-    app.spawnTime = 1
+    app.spawnTime = 5
     app.speedFactor = 5
 
     app.map = Map(Map.allTypes)

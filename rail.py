@@ -1,6 +1,6 @@
 from cmu_graphics import *
 import random
-import map
+import map as mapFile
 
 
 class Rail:
@@ -37,7 +37,7 @@ class Rail:
         # if len(self.directions) == 1:
         #     return
 
-        worldPos = self.toWorldPos(app)
+        worldPos = mapFile.Map.toWorldPos(self.indices, app)
 
         # determine rail display dependo on connections
         if "top" in self.directions and "bottom" in self.directions:
@@ -92,7 +92,7 @@ class Rail:
     # region map generation
     def floodFill(self, app, prevDirection):
         # bias to move straight
-        if random.random() < map.Map.probOfStraight:
+        if random.random() < mapFile.Map.probOfStraight:
             dif = Rail.directionToDif[prevDirection]
             self.connect(app, dif)
 
@@ -107,7 +107,7 @@ class Rail:
         col = self.indices[1] + dif[1]
 
         # out of bound cases
-        if not Rail.inBound(app.map, (row, col)):
+        if not mapFile.Map.inBound(app.map, (row, col)):
             return
 
         # if never visited
@@ -120,7 +120,7 @@ class Rail:
             app.map.rails[row][col].floodFill(app, Rail.difToDirection[dif])
 
         # determine using probability of connection if to connect to this rail)
-        if random.random() < map.Map.probOfConnect:
+        if random.random() < mapFile.Map.probOfConnect:
             self.connectToRail(app.map.rails[row][col], dif)
 
     def connectToRail(self, other, dif):
@@ -134,7 +134,7 @@ class Rail:
             dif = Rail.directionToDif[Rail.directionComplement[min(self.directions)]]
             otherIndices = (self.indices[0] + dif[0], self.indices[1] + dif[1])
             # in bound and out of bound cases
-            if Rail.inBound(app.map, otherIndices):
+            if mapFile.Map.inBound(app.map, otherIndices):
                 other = app.map.rails[otherIndices[0]][otherIndices[1]]
                 self.connectToRail(other, dif)
             else:
@@ -202,23 +202,5 @@ class Rail:
             self.directions.add("right")
             self.spawnCarDirection = "right"
             spawnableRails.append(self)
-
-    # endregion
-
-    # region helper functions
-    def toWorldPos(self, app):
-        return (
-            app.unitSize * (self.indices[1] + 0.5),
-            app.unitSize * (self.indices[0] + 0.5),
-        )
-
-    @staticmethod
-    def inBound(map, indices):
-        return (
-            indices[0] >= 0
-            and indices[0] < len(map.rails)
-            and indices[1] >= 0
-            and indices[1] < len(map.rails[0])
-        )
 
     # endregion

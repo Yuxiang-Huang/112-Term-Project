@@ -1,4 +1,5 @@
 import rail as railFile
+from destination import *
 import math
 import random
 
@@ -12,6 +13,7 @@ class Map:
     def __init__(self, allTypes):
         self.allTypes = allTypes
         self.allCars = []
+        self.allDestinations = []
 
     def createMap(self, app, mapSize):
         # initlizations
@@ -54,6 +56,9 @@ class Map:
             for rail in rowList:
                 rail.createAllDirections()
 
+        # create destinations
+        self.createDestinations(app, mapSize)
+
     def display(self, app):
         for rowList in self.rails:
             for curRail in rowList:
@@ -61,8 +66,34 @@ class Map:
         for car in self.allCars:
             car.move(app)
             car.display()
+        for destination in self.allDestinations:
+            destination.display()
 
     def findRail(self, app, mouseX, mouseY):
         return self.rails[math.floor(mouseY / app.unitSize)][
             math.floor(mouseX / app.unitSize)
         ]
+
+    def createDestinations(self, app, mapSize):
+        randomRow = random.randint(0, mapSize - 1)
+        randomCol = random.randint(0, mapSize - 1)
+        self.allDestinations.append(Destination((randomRow, randomCol), app.unitSize))
+
+    # region helper functions
+    @staticmethod
+    def toWorldPos(indices, app):
+        return (
+            app.unitSize * (indices[1] + 0.5),
+            app.unitSize * (indices[0] + 0.5),
+        )
+
+    @staticmethod
+    def inBound(map, indices):
+        return (
+            indices[0] >= 0
+            and indices[0] < len(map.rails)
+            and indices[1] >= 0
+            and indices[1] < len(map.rails[0])
+        )
+
+    # endregion

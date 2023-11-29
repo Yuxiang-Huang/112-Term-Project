@@ -1,5 +1,6 @@
 from cmu_graphics import *
 from rail import *
+from map import *
 import math
 
 
@@ -32,7 +33,7 @@ class Car:
     def move(self, app):
         # region change pos base on animation count
         ratio = self.animationCount / (app.stepsPerSecond / app.speedFactor)
-        railPos = self.rail.toWorldPos(app)
+        railPos = Map.toWorldPos(self.rail.indices, app)
         # region straight cases
         if self.movingFrom == "left" and self.movingTo == "right":
             self.pos = (
@@ -147,7 +148,7 @@ class Car:
         curIndices = (curIndices[0] + dif[0], curIndices[1] + dif[1])
 
         # check for out of bound
-        if Rail.inBound(map, curIndices):
+        if Map.inBound(map, curIndices):
             return map.rails[curIndices[0]][curIndices[1]]
         else:
             return None
