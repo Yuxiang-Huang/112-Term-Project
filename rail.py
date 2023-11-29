@@ -1,6 +1,7 @@
 from cmu_graphics import *
-import random
 import map as mapFile
+from destination import *
+import random
 
 
 class Rail:
@@ -29,6 +30,7 @@ class Rail:
         self.directions = directions
         self.spawnCarDirection = None
         self.car = None
+        self.destination = None
 
     def __repr__(self):
         return f"Pos: {self.indices}, Dir: {self.allDirections}"
@@ -89,7 +91,7 @@ class Rail:
             self.dirIndex %= len(self.allDirections)
             self.directions = self.allDirections[self.dirIndex]
 
-    # region map generation
+    # region rail generation
     def floodFill(self, app, prevDirection):
         # bias to move straight
         if random.random() < mapFile.Map.probOfStraight:
@@ -204,3 +206,56 @@ class Rail:
             spawnableRails.append(self)
 
     # endregion
+
+    # region destination generation
+    def createDestination(self, map, type, unitSize, usedIndices):
+        # can't be switchable
+        if len(self.allDirections) > 1:
+            return False
+
+        # need to be straight
+        directionList = list(self.directions)
+        if directionList[0] != Rail.directionComplement[directionList[1]]:
+            return False
+
+        # determine relative positive
+        if "top" in self.directions:
+            relativePositions = ["left", "right"]
+        if "right" in self.directions:
+            relativePositions = ["top", "bottom"]
+
+        random.shuffle(relativePositions)
+
+        for relativePos in relativePositions:
+            if self.checkNeighborForDestination(map, relativePos):
+                self.destination = Destination(
+                    (self.indices[0], self.indices[1]), unitSize, type, relativePos
+                )
+                return True
+
+        # return False if both direction doesn't work
+        return False
+
+    def checkNeighborForDestination(self, map, relativePos):
+        otherRail = self.neighborRail(map, relativePos)
+
+        if otherRail == None:
+            return True
+
+        # can't be switchable
+        if len(otherRail.allDirections) > 1:
+            return False
+
+        # also add desitnation to it if staight in the same way
+        if self.directions == otherRail.directions:
+            pass
+
+        return True
+
+    # endregion
+
+    def neighborRail(self, map, direction):
+        dif = Rail.directionToDif[direction]
+        newIndices = (self.indices[0] + dif[0], self.indices[1] + dif[1])
+        if mapFile.Map.inBound(map, newIndices):
+            return map.rails[newIndices[0]][newIndices[1]]

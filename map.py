@@ -1,5 +1,4 @@
 import rail as railFile
-from destination import *
 import math
 import random
 
@@ -67,7 +66,7 @@ class Map:
             car.move(app)
             car.display()
         for destination in self.allDestinations:
-            destination.display()
+            destination.display(app)
 
     def findRail(self, app, mouseX, mouseY):
         return self.rails[math.floor(mouseY / app.unitSize)][
@@ -75,9 +74,23 @@ class Map:
         ]
 
     def createDestinations(self, app, mapSize):
-        randomRow = random.randint(0, mapSize - 1)
-        randomCol = random.randint(0, mapSize - 1)
-        self.allDestinations.append(Destination((randomRow, randomCol), app.unitSize))
+        # for each type
+        for type in self.allTypes:
+            usedIndices = []
+            # create app.destinationRatio many destinations for this type
+            for _ in range(app.destinationRatio):
+                # keep trying random locations
+                randomRow = random.randint(0, mapSize - 1)
+                randomCol = random.randint(0, mapSize - 1)
+                curRail = self.rails[randomRow][randomCol]
+                while not curRail.createDestination(
+                    self, type, app.unitSize, usedIndices
+                ):
+                    randomRow = random.randint(0, mapSize - 1)
+                    randomCol = random.randint(0, mapSize - 1)
+                    curRail = self.rails[randomRow][randomCol]
+                self.allDestinations.append(curRail.destination)
+                usedIndices.append((randomRow, randomCol))
 
     # region helper functions
     @staticmethod
