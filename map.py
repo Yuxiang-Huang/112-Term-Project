@@ -7,7 +7,7 @@ class Map:
     probOfStraight = 0.1
     probOfConnect = 0  # 0.05
 
-    minDifBtwDestination = None
+    minDifBtwDestination = 3
 
     allTypes = ["red", "green", "blue", "purple", "yellow", "orange"]
 
@@ -20,8 +20,6 @@ class Map:
         # initlizations
         self.rails = [[None] * mapSize for _ in range(mapSize)]
         app.unitSize = app.width / mapSize
-
-        Map.minDifBtwDestination = mapSize // len(self.allTypes) // app.destinationRatio
 
         # create rails
         self.spawnableRails = []
@@ -81,21 +79,17 @@ class Map:
     def createDestinations(self, app, mapSize):
         # for each type
         for type in self.allTypes:
-            usedIndices = []
             # create app.destinationRatio many destinations for this type
             for _ in range(app.destinationRatio):
                 # keep trying random locations
                 randomRow = random.randint(0, mapSize - 1)
                 randomCol = random.randint(0, mapSize - 1)
                 curRail = self.rails[randomRow][randomCol]
-                while not curRail.createDestination(
-                    self, type, app.unitSize, usedIndices
-                ):
+                while not curRail.createDestination(self, type, app.unitSize):
                     randomRow = random.randint(0, mapSize - 1)
                     randomCol = random.randint(0, mapSize - 1)
                     curRail = self.rails[randomRow][randomCol]
-                self.allDestinations.extend(curRail.destination)
-                usedIndices.append((randomRow, randomCol))
+                self.allDestinations.extend(curRail.destinationList)
 
     # region helper functions
     @staticmethod

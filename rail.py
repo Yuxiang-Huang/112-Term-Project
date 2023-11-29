@@ -30,7 +30,7 @@ class Rail:
         self.directions = directions
         self.spawnCarDirection = None
         self.car = None
-        self.destination = []
+        self.destinationList = []
 
     def __repr__(self):
         return f"Pos: {self.indices}, Dir: {self.allDirections}"
@@ -208,7 +208,7 @@ class Rail:
     # endregion
 
     # region destination generation
-    def createDestination(self, map, type, unitSize, usedIndices):
+    def createDestination(self, map, type, unitSize):
         # can't be switchable
         if len(self.allDirections) > 1:
             return False
@@ -216,6 +216,10 @@ class Rail:
         # need to be straight
         directionList = list(self.directions)
         if directionList[0] != Rail.directionComplement[directionList[1]]:
+            return False
+
+        # not too close with other destinations
+        if self.tooClose(map.allDestinations):
             return False
 
         # determine relative positive
@@ -231,12 +235,12 @@ class Rail:
         for relativePos in relativePositions:
             neighborRail = self.neighborRail(map, relativePos)
             if self.checkNeighborForDestination(neighborRail, relativePos):
-                self.destination.append(
-                    Destination(
-                        (self.indices[0], self.indices[1]), unitSize, type, relativePos
-                    )
+                newDestination = Destination(
+                    (self.indices[0], self.indices[1]), unitSize, type, relativePos
                 )
-
+                # add to destination list of both rails
+                self.destinationList.append(newDestination)
+                neighborRail.destinationList.append(newDestination)
                 return True
 
         # return False if both direction doesn't work
@@ -248,10 +252,10 @@ class Rail:
             return False
 
         # can't already have a destination in the same way
-        if len(neighborRail.destination) == 2:
+        if len(neighborRail.destinationList) == 2:
             return False
-        elif len(neighborRail.destination) == 1:
-            if neighborRail.destination[0] == Rail.directionComplement[relativePos]:
+        elif len(neighborRail.destinationList) == 1:
+            if neighborRail.destinationList[0] == Rail.directionComplement[relativePos]:
                 return False
 
         # can't be switchable
@@ -263,6 +267,17 @@ class Rail:
             return False
 
         return True
+
+    def tooClose(self, allDestinations):
+        # check all destinations
+        for destination in allDestinations:
+            # check if it is less thatn the minimum difference
+            dif = abs(destination.indices[0] - self.indices[0]) + abs(
+                destination.indices[1] - self.indices[1]
+            )
+            if dif < mapFile.Map.minDifBtwDestination:
+                return True
+        return False
 
     # endregion
 
