@@ -13,7 +13,7 @@ def onAppStart(app):
     mapSize = 15
     app.spawnTime = 5
     app.speedFactor = 5
-    app.destinationRatio = 1
+    app.destinationRatio = 3
 
     app.map = Map(Map.allTypes)
     app.map.createMap(app, mapSize)

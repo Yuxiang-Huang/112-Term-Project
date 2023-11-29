@@ -7,6 +7,8 @@ class Map:
     probOfStraight = 0.1
     probOfConnect = 0  # 0.05
 
+    minDifBtwDestination = None
+
     allTypes = ["red", "green", "blue", "purple", "yellow", "orange"]
 
     def __init__(self, allTypes):
@@ -19,6 +21,9 @@ class Map:
         self.rails = [[None] * mapSize for _ in range(mapSize)]
         app.unitSize = app.width / mapSize
 
+        Map.minDifBtwDestination = mapSize // len(self.allTypes) // app.destinationRatio
+
+        # create rails
         self.spawnableRails = []
 
         # start with the most left center rail
@@ -47,7 +52,7 @@ class Map:
             mapSize, randomIndex, self.spawnableRails
         )
 
-        # finalize
+        # finalize rails
         for rowList in self.rails:
             for rail in rowList:
                 rail.fixOneDirectionRail(app, self.spawnableRails)
@@ -89,7 +94,7 @@ class Map:
                     randomRow = random.randint(0, mapSize - 1)
                     randomCol = random.randint(0, mapSize - 1)
                     curRail = self.rails[randomRow][randomCol]
-                self.allDestinations.append(curRail.destination)
+                self.allDestinations.extend(curRail.destination)
                 usedIndices.append((randomRow, randomCol))
 
     # region helper functions

@@ -30,7 +30,7 @@ class Rail:
         self.directions = directions
         self.spawnCarDirection = None
         self.car = None
-        self.destination = None
+        self.destination = []
 
     def __repr__(self):
         return f"Pos: {self.indices}, Dir: {self.allDirections}"
@@ -224,31 +224,43 @@ class Rail:
         if "right" in self.directions:
             relativePositions = ["top", "bottom"]
 
+        # random relative position
         random.shuffle(relativePositions)
 
+        # try each relative position
         for relativePos in relativePositions:
-            if self.checkNeighborForDestination(map, relativePos):
-                self.destination = Destination(
-                    (self.indices[0], self.indices[1]), unitSize, type, relativePos
+            neighborRail = self.neighborRail(map, relativePos)
+            if self.checkNeighborForDestination(neighborRail, relativePos):
+                self.destination.append(
+                    Destination(
+                        (self.indices[0], self.indices[1]), unitSize, type, relativePos
+                    )
                 )
+
                 return True
 
         # return False if both direction doesn't work
         return False
 
-    def checkNeighborForDestination(self, map, relativePos):
-        otherRail = self.neighborRail(map, relativePos)
-
-        if otherRail == None:
-            return True
-
-        # can't be switchable
-        if len(otherRail.allDirections) > 1:
+    def checkNeighborForDestination(self, neighborRail, relativePos):
+        # edge rails are not valid
+        if neighborRail == None:
             return False
 
-        # also add desitnation to it if staight in the same way
-        if self.directions == otherRail.directions:
-            pass
+        # can't already have a destination in the same way
+        if len(neighborRail.destination) == 2:
+            return False
+        elif len(neighborRail.destination) == 1:
+            if neighborRail.destination[0] == Rail.directionComplement[relativePos]:
+                return False
+
+        # can't be switchable
+        if len(neighborRail.allDirections) > 1:
+            return False
+
+        # need to be straight in the same way
+        if self.directions != neighborRail.directions:
+            return False
 
         return True
 
