@@ -22,10 +22,15 @@ class Car:
         self.animationCount = 0
         self.rail = None
 
+        self.pos = [-1, -1]
+
         # pretend there is a straight rail connect to the spawn rail
         self.movingTo = Rail.directionComplement[spawnRail.spawnCarDirection]
         self.nextRail = spawnRail
         self.changeRail(app.map)
+
+    def display(self):
+        drawCircle(self.pos[0], self.pos[1], self.size, fill=self.type)
 
     def checkDestination(self, app):
         # only check after reaching halfway
@@ -37,12 +42,24 @@ class Car:
                     # add points and remove car from game
                     app.points += int(self.speed * 100)
                     app.map.allCars.remove(self)
+                    self.rail.cars.remove(self)
 
-    def display(self):
-        drawCircle(self.pos[0], self.pos[1], self.size, fill=self.type)
-
-    def checkForCollision(self):
-        pass
+    def checkForCollision(self, app):
+        # check for cars in this rail
+        for car in self.rail.cars:
+            if car != self:
+                # if distance is less than diameter
+                if (
+                    distance(self.pos[0], self.pos[1], car.pos[0], car.pos[1])
+                    < 2 * self.size
+                ):
+                    # delete points and remove cars from game
+                    app.points -= int(self.speed * 100)
+                    app.points -= int(car.speed * 100)
+                    app.map.allCars.remove(self)
+                    app.map.allCars.remove(car)
+                    self.rail.cars.remove(self)
+                    self.rail.cars.remove(car)
 
     def move(self, app):
         # region change pos base on animation count

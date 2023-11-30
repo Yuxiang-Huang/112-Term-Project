@@ -18,7 +18,7 @@ class Map:
         for car in self.allCars:
             car.move(app)
             car.checkDestination(app)
-            car.checkForCollision()
+            car.checkForCollision(app)
 
     def display(self, app):
         for rowList in self.rails:
@@ -30,7 +30,7 @@ class Map:
             destination.display(app)
 
     def createMap(self, app, mapSize):
-        Map.minDifBtwDestination = 3 // app.destinationRatio
+        Map.minDifBtwDestination = 0  # 3 // app.destinationRatio
 
         # initlizations
         self.rails = [[None] * mapSize for _ in range(mapSize)]
