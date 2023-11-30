@@ -7,6 +7,8 @@ class Map:
     probOfStraight = 0.1
     probOfConnect = 0  # 0.05
 
+    minDifBtwDestination = 3
+
     allTypes = ["purple", "blue", "green", "yellow", "orange", "red"]
 
     def __init__(self, allTypes):
@@ -31,8 +33,6 @@ class Map:
             destination.display(app)
 
     def createMap(self, app, mapSize):
-        Map.minDifBtwDestination = 3
-
         # initlizations
         self.rails = [[None] * mapSize for _ in range(mapSize)]
         app.unitSize = app.width / mapSize

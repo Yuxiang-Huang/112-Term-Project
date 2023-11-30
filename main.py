@@ -19,6 +19,7 @@ def onAppStart(app):
 
     app.points = 0
     app.paused = False
+    app.switchVisualizer = False
 
     # create map
     app.map = Map(app.typeChoices)

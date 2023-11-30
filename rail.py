@@ -36,9 +36,22 @@ class Rail:
         return f"Pos: {self.indices}, Dir: {self.allDirections}"
 
     def display(self, app):
-        # if len(self.directions) == 1:
-        #     return
+        # visualize for multi rail
+        if app.switchVisualizer and len(self.allDirections) > 1:
+            worldPos = mapFile.Map.toWorldPos(self.indices, app)
+            drawOval(
+                worldPos[0],
+                worldPos[1],
+                self.size,
+                self.size,
+                fill="lightyellow",
+            )
+            self.onPress(0)
+            self.displayHelper(app, 25)
+            self.onPress(1)
+        self.displayHelper(app, 100)
 
+    def displayHelper(self, app, opacity):
         worldPos = mapFile.Map.toWorldPos(self.indices, app)
 
         # determine rail display dependo on connections
@@ -61,16 +74,6 @@ class Rail:
             type = "Turn"
             angle = 270
 
-        # special case for clickable rails
-        if len(self.allDirections) > 1:
-            drawOval(
-                worldPos[0],
-                worldPos[1],
-                self.size,
-                self.size,
-                fill="lightyellow",
-            )
-
         drawImage(
             app.imageDict[type],
             worldPos[0],
@@ -79,8 +82,8 @@ class Rail:
             height=self.size,
             align="center",
             rotateAngle=angle,
+            opacity=opacity,
         )
-        # drawLabel(self.indices, worldPos[0], worldPos[1])
 
     def onPress(self, button):
         if len(self.allDirections) > 1 and self.cars == []:
