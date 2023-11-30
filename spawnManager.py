@@ -10,7 +10,14 @@ class SpawnManager:
     def takeStep(self, app):
         # spawn every spawn time
         self.count += 1
-        if self.count >= app.stepsPerSecond * app.spawnTime:
+        # immediately spawn a car if there is no car
+        if len(app.map.allCars) == 0:
+            app.spawnManager.spawn(app)
+            self.count = 0
+        # current spawn time will decrease as points increase with a minimum
+        elif self.count >= app.stepsPerSecond * (
+            max(app.spawnTime / 5, app.spawnTime - app.points / 500)
+        ):
             self.spawn(app)
             self.count = 0
 

@@ -27,8 +27,16 @@ class Car:
         self.nextRail = spawnRail
         self.changeRail(app.map)
 
-    def checkDestination(self):
-        pass
+    def checkDestination(self, app):
+        # only check after reaching halfway
+        if self.animationCount > app.stepsPerSecond / app.speedFactor / 2:
+            # check all destinations in this rail
+            for destination in self.rail.destinationList:
+                # check for the same type
+                if destination.type == self.type:
+                    # add points and remove car from game
+                    app.points += int(self.speed * 100)
+                    app.map.allCars.remove(self)
 
     def display(self):
         drawCircle(self.pos[0], self.pos[1], self.size, fill=self.type)
