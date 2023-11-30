@@ -18,6 +18,7 @@ class Map:
         for car in self.allCars:
             car.move(app)
             car.checkDestination(app)
+        for car in self.allCars:
             car.checkForCollision(app)
 
     def display(self, app):
@@ -30,7 +31,7 @@ class Map:
             destination.display(app)
 
     def createMap(self, app, mapSize):
-        Map.minDifBtwDestination = 0  # 3 // app.destinationRatio
+        Map.minDifBtwDestination = 3
 
         # initlizations
         self.rails = [[None] * mapSize for _ in range(mapSize)]
@@ -82,14 +83,18 @@ class Map:
             # create app.destinationRatio many destinations for this type
             for _ in range(app.destinationRatio):
                 # keep trying random locations
-                randomRow = random.randint(0, mapSize - 1)
-                randomCol = random.randint(0, mapSize - 1)
+                randomRow = self.getRandomIndex(mapSize)
+                randomCol = self.getRandomIndex(mapSize)
                 curRail = self.rails[randomRow][randomCol]
                 while not curRail.createDestination(self, type, app.unitSize):
-                    randomRow = random.randint(0, mapSize - 1)
-                    randomCol = random.randint(0, mapSize - 1)
+                    randomRow = self.getRandomIndex(mapSize)
+                    randomCol = self.getRandomIndex(mapSize)
                     curRail = self.rails[randomRow][randomCol]
                 self.allDestinations.extend(curRail.destinationList)
+
+    def getRandomIndex(self, mapSize):
+        # return random.randint(0, (mapSize - 1) // 2) + mapSize // 4
+        return random.randint(0, mapSize - 1)
 
     def findRail(self, app, mouseX, mouseY):
         return self.rails[math.floor((mouseY - app.height + app.width) / app.unitSize)][
