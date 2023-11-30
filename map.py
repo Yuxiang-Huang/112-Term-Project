@@ -18,6 +18,7 @@ class Map:
         for car in self.allCars:
             car.move(app)
             car.checkDestination(app)
+            car.checkForCollision()
 
     def display(self, app):
         for rowList in self.rails:

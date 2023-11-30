@@ -29,7 +29,7 @@ class Rail:
         self.indices = indices
         self.directions = directions
         self.spawnCarDirection = None
-        self.car = None
+        self.cars = []
         self.destinationList = []
 
     def __repr__(self):
@@ -83,7 +83,7 @@ class Rail:
         # drawLabel(self.indices, worldPos[0], worldPos[1])
 
     def onPress(self, button):
-        if len(self.allDirections) > 1 and self.car == None:
+        if len(self.allDirections) > 1 and self.cars == []:
             if button == 0:
                 self.dirIndex += 1
             else:

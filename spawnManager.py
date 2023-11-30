@@ -14,10 +14,8 @@ class SpawnManager:
         if len(app.map.allCars) == 0:
             app.spawnManager.spawn(app)
             self.count = 0
-        # current spawn time will decrease as points increase with a minimum
-        elif self.count >= app.stepsPerSecond * (
-            max(app.spawnTime / 5, app.spawnTime - app.points / 500)
-        ):
+
+        elif self.calculateSpawnTimeLeft() < 0:
             self.spawn(app)
             self.count = 0
 
@@ -28,3 +26,11 @@ class SpawnManager:
         # create car and add to the list of all cars
         spawnCar = Car(app, spawnType, spawnRail)
         app.map.allCars.append(spawnCar)
+
+    def calculateSpawnTimeLeft(self):
+        # current spawn time will decrease as points increase with a minimum
+        return (
+            app.stepsPerSecond
+            * max(app.spawnTime / 5, app.spawnTime - app.points / 500)
+            - self.count
+        )

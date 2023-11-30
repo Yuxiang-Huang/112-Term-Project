@@ -32,6 +32,17 @@ def redrawAll(app):
         f"Points: {app.points}", app.width / 2, topBarHeight / 2, size=24, fill="white"
     )
 
+    # secondsLeft = (
+    #     app.spawnManager.calculateSpawnTimeLeft() * 10 // app.stepsPerSecond / 10
+    # )
+    # drawLabel(
+    #     f"Next car spawns in: {secondsLeft} seconds",
+    #     app.width * 3 / 4,
+    #     topBarHeight / 2,
+    #     size=24,
+    #     fill="white",
+    # )
+
     app.map.display(app)
 
 

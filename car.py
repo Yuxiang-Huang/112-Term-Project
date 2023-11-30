@@ -41,6 +41,9 @@ class Car:
     def display(self):
         drawCircle(self.pos[0], self.pos[1], self.size, fill=self.type)
 
+    def checkForCollision(self):
+        pass
+
     def move(self, app):
         # region change pos base on animation count
         ratio = self.animationCount / (app.stepsPerSecond / app.speedFactor)
@@ -143,9 +146,9 @@ class Car:
         self.movingFrom = Rail.directionComplement[self.movingTo]
         # change rail to the next rail
         if self.rail != None:
-            self.rail.car = None
+            self.rail.cars.remove(self)
         self.rail = self.nextRail
-        self.rail.car = self
+        self.rail.cars.append(self)
         # moving to is the other direction of this rail
         self.movingTo = (self.rail.directions - {self.movingFrom}).pop()
         # calculate next rail
