@@ -51,12 +51,16 @@ class Rail:
             # left click
             if button == 0:
                 # switch to next rail
-                self.dirIndex += 1
-                self.dirIndex %= len(self.allDirections)
-                self.directions = self.allDirections[self.dirIndex]
+                self.changeDirectionsHelper(1)
             # right click to select rail
             else:
                 app.selectedRail = self
+
+    def changeDirectionsHelper(self, deltaIndex):
+        # switch to next rail
+        self.dirIndex += deltaIndex
+        self.dirIndex %= len(self.allDirections)
+        self.directions = self.allDirections[self.dirIndex]
 
     # region display
     def createRailSwitchButtons(self):
@@ -144,7 +148,7 @@ class Rail:
             )
             # display next rail if app.switch visualizer is on
             if app.switchVisualizer:
-                self.onPress(0)
+                self.changeDirectionsHelper(1)
                 type, angle = self.getTypeAngleForDisplay(self.directions)
                 drawImage(
                     app.imageDict[type],
@@ -156,7 +160,7 @@ class Rail:
                     rotateAngle=angle,
                     opacity=25,
                 )
-                self.onPress(1)
+                self.changeDirectionsHelper(-1)
         type, angle = self.getTypeAngleForDisplay(self.directions)
         drawImage(
             app.imageDict[type],

@@ -101,6 +101,10 @@ def onStep(app):
     if app.paused:
         return
 
+    # automatically deselect rail if a car went on it
+    if app.selectedRail != None and app.selectedRail.cars != []:
+        app.selectedRail = None
+
     app.spawnManager.takeStep(app)
     app.map.update(app)
 
