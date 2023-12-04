@@ -115,35 +115,57 @@ class Rail:
                 app.selectedRail = self
 
     def selectedRailDisplay(self, app):
-        sizeFactor = 9 / 10
+        sizeFactor = 4 / 5
 
         worldPos = mapFile.Map.toWorldPos(self.indices, app)
-        drawRect(
-            worldPos[0], worldPos[1], app.unitSize * 3, app.unitSize, align="bottom"
-        )
-        xOffSet = 0
-        yOffset = -app.unitSize / 2
-        for i in range(3):
-            type, angle = self.getTypeAngleForDisplay(self.allDirections[i], app)
-            xCoord = worldPos[0] + (i - 1) * self.size + xOffSet
-            yCoord = worldPos[1] + yOffset
-            drawOval(
-                xCoord,
-                yCoord,
-                self.size * sizeFactor,
-                self.size * sizeFactor,
-                fill="red",
+
+        if len(self.allDirections) == 3:
+            # find the offset
+            xOffSet = 0
+            yOffset = -app.unitSize
+            # first row case
+            if self.indices[0] == 0:
+                yOffset = app.unitSize
+
+            # first column case
+            if self.indices[1] == 0:
+                xOffSet = app.unitSize
+
+            # last column case
+            if self.indices[1] == len(app.map.rails[0]) - 1:
+                xOffSet = -app.unitSize
+
+            # draw background
+            drawRect(
+                worldPos[0] + xOffSet,
+                worldPos[1] + yOffset + app.unitSize / 2,
+                app.unitSize * 3,
+                app.unitSize,
+                align="bottom",
             )
-            drawImage(
-                app.imageDict[type],
-                xCoord,
-                yCoord,
-                width=self.size * sizeFactor,
-                height=self.size * sizeFactor,
-                align="center",
-                rotateAngle=angle,
-                opacity=100,
-            )
+
+            # draw rails
+            for i in range(len(self.allDirections)):
+                type, angle = self.getTypeAngleForDisplay(self.allDirections[i], app)
+                xCoord = worldPos[0] + (i - 1) * self.size + xOffSet
+                yCoord = worldPos[1] + yOffset
+                drawOval(
+                    xCoord,
+                    yCoord,
+                    self.size * sizeFactor,
+                    self.size * sizeFactor,
+                    fill="red",
+                )
+                drawImage(
+                    app.imageDict[type],
+                    xCoord,
+                    yCoord,
+                    width=self.size * sizeFactor,
+                    height=self.size * sizeFactor,
+                    align="center",
+                    rotateAngle=angle,
+                    opacity=100,
+                )
 
     # region rail generation
     def floodFill(self, app, prevDirection):
