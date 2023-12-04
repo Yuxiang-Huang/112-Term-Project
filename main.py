@@ -11,7 +11,6 @@ def onAppStart(app):
     app.stepsPerSecond = 30
     app.speedFactor = 5
 
-    app.directionSort = True
     mapSize = 15
     app.spawnTime = 5
     app.destinationRatio = 3
@@ -20,11 +19,15 @@ def onAppStart(app):
         "blue",
         "green",
     ]  # "purple", "blue", "green", "yellow", "orange", "red"
-    app.switchVisualizer = False
+    app.probOfStraight = 0.1
+    app.probOfExtraConnect = 0  # 0.05
+    app.minDifBtwDestination = 3
 
+    # in game variables
     app.points = 0
     app.paused = False
     app.selectedRail = None
+    app.switchVisualizer = False
 
     # create map
     app.map = Map(app.typeChoices)

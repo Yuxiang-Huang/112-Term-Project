@@ -4,13 +4,6 @@ import random
 
 
 class Map:
-    probOfStraight = 0.1
-    probOfConnect = 0  # 0.05
-
-    minDifBtwDestination = 3
-
-    allTypes = ["purple", "blue", "green", "yellow", "orange", "red"]
-
     def __init__(self, allTypes):
         self.allTypes = allTypes
         self.allCars = []
@@ -95,7 +88,7 @@ class Map:
                 randomRow = self.getRandomIndex(mapSize)
                 randomCol = self.getRandomIndex(mapSize)
                 curRail = self.rails[randomRow][randomCol]
-                while not curRail.createDestination(self, type, app.unitSize):
+                while not curRail.createDestination(self, type, app.unitSize, app):
                     randomRow = self.getRandomIndex(mapSize)
                     randomCol = self.getRandomIndex(mapSize)
                     curRail = self.rails[randomRow][randomCol]

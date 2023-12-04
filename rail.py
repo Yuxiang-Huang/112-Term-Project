@@ -219,7 +219,7 @@ class Rail:
     # region rail generation
     def floodFill(self, app, prevDirection):
         # bias to move straight
-        if random.random() < mapFile.Map.probOfStraight:
+        if random.random() < app.probOfStraight:
             dif = Rail.directionToDif[prevDirection]
             self.connect(app, dif)
 
@@ -246,8 +246,8 @@ class Rail:
             # flood fill the rest of the map
             app.map.rails[row][col].floodFill(app, Rail.difToDirection[dif])
 
-        # determine using probability of connection if to connect to this rail)
-        if random.random() < mapFile.Map.probOfConnect:
+        # determine using probability of extra connection if to connect to this rail)
+        if random.random() < app.probOfExtraConnect:
             self.connectToRail(app.map.rails[row][col], dif)
 
     def connectToRail(self, other, dif):
@@ -290,27 +290,18 @@ class Rail:
         else:
             self.allDirections = []
             # hard coded to be sorted...
-            if app.directionSort:
-                if "top" in self.directions and "bottom" in self.directions:
-                    self.allDirections.append({"top", "bottom"})
-                if "left" in self.directions and "right" in self.directions:
-                    self.allDirections.append({"left", "right"})
-                if "top" in self.directions and "left" in self.directions:
-                    self.allDirections.append({"top", "left"})
-                if "top" in self.directions and "right" in self.directions:
-                    self.allDirections.append({"top", "right"})
-                if "bottom" in self.directions and "right" in self.directions:
-                    self.allDirections.append({"bottom", "right"})
-                if "bottom" in self.directions and "left" in self.directions:
-                    self.allDirections.append({"bottom", "left"})
-            else:
-                # random directions
-                for dir1 in self.directions:
-                    for dir2 in self.directions:
-                        curDir = {dir1, dir2}
-                        # check for duplicates
-                        if len(curDir) == 2 and curDir not in self.allDirections:
-                            self.allDirections.append(curDir)
+            if "top" in self.directions and "bottom" in self.directions:
+                self.allDirections.append({"top", "bottom"})
+            if "left" in self.directions and "right" in self.directions:
+                self.allDirections.append({"left", "right"})
+            if "top" in self.directions and "left" in self.directions:
+                self.allDirections.append({"top", "left"})
+            if "top" in self.directions and "right" in self.directions:
+                self.allDirections.append({"top", "right"})
+            if "bottom" in self.directions and "right" in self.directions:
+                self.allDirections.append({"bottom", "right"})
+            if "bottom" in self.directions and "left" in self.directions:
+                self.allDirections.append({"bottom", "left"})
 
             # make sure spawnable rails stays spawnable
             if self.spawnCarDirection != None:
@@ -346,7 +337,7 @@ class Rail:
     # endregion
 
     # region destination generation
-    def createDestination(self, map, type, unitSize):
+    def createDestination(self, map, type, unitSize, app):
         # can't be switchable
         if len(self.allDirections) > 1:
             return False
@@ -357,7 +348,7 @@ class Rail:
             return False
 
         # not too close with other destinations
-        if self.tooClose(map.allDestinations):
+        if self.tooClose(map.allDestinations, app):
             return False
 
         # determine relative positive
@@ -406,14 +397,14 @@ class Rail:
 
         return True
 
-    def tooClose(self, allDestinations):
+    def tooClose(self, allDestinations, app):
         # check all destinations
         for destination in allDestinations:
             # check if it is less thatn the minimum difference
             dif = abs(destination.indices[0] - self.indices[0]) + abs(
                 destination.indices[1] - self.indices[1]
             )
-            if dif < mapFile.Map.minDifBtwDestination:
+            if dif < app.minDifBtwDestination:
                 return True
         return False
 
