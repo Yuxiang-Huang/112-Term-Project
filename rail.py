@@ -32,6 +32,7 @@ class Rail:
         self.spawnCarDirection = None
         self.cars = []
         self.destinationList = []
+        self.pos = mapFile.Map.toWorldPos(self.indices, app)
 
     def __repr__(self):
         return f"Pos: {self.indices}, Dir: {self.allDirections}"
@@ -58,8 +59,6 @@ class Rail:
         self.switchButtons = []
         sizeFactor = 4 / 5
 
-        worldPos = mapFile.Map.toWorldPos(self.indices, app)
-
         if len(self.allDirections) == 3:
             # find the offset
             xOffSet = 0
@@ -78,15 +77,15 @@ class Rail:
 
             # store background info
             self.switchButtonsBackgroundPos = (
-                worldPos[0] + xOffSet,
-                worldPos[1] + yOffset + app.unitSize / 2,
+                self.pos[0] + xOffSet,
+                self.pos[1] + yOffset + app.unitSize / 2,
             )
 
             # create one button for each direction
             for i in range(len(self.allDirections)):
                 type, angle = self.getTypeAngleForDisplay(self.allDirections[i])
-                xCoord = worldPos[0] + (i - 1) * self.size + xOffSet
-                yCoord = worldPos[1] + yOffset
+                xCoord = self.pos[0] + (i - 1) * self.size + xOffSet
+                yCoord = self.pos[1] + yOffset
                 self.switchButtons.append(
                     RailSwitchButton(
                         [xCoord, yCoord], self.size * sizeFactor, type, angle
@@ -94,13 +93,12 @@ class Rail:
                 )
 
     def display(self, app):
-        worldPos = mapFile.Map.toWorldPos(self.indices, app)
         # visualize for multi rail
         if len(self.allDirections) > 1:
             # draw circle background
             drawOval(
-                worldPos[0],
-                worldPos[1],
+                self.pos[0],
+                self.pos[1],
                 self.size,
                 self.size,
                 fill="lightyellow",
@@ -111,8 +109,8 @@ class Rail:
                 type, angle = self.getTypeAngleForDisplay(self.directions)
                 drawImage(
                     app.imageDict[type],
-                    worldPos[0],
-                    worldPos[1],
+                    self.pos[0],
+                    self.pos[1],
                     width=self.size,
                     height=self.size,
                     align="center",
@@ -123,8 +121,8 @@ class Rail:
         type, angle = self.getTypeAngleForDisplay(self.directions)
         drawImage(
             app.imageDict[type],
-            worldPos[0],
-            worldPos[1],
+            self.pos[0],
+            self.pos[1],
             width=self.size,
             height=self.size,
             align="center",
@@ -155,10 +153,6 @@ class Rail:
         return type, angle
 
     def selectedRailDisplay(self, app):
-        sizeFactor = 4 / 5
-
-        worldPos = mapFile.Map.toWorldPos(self.indices, app)
-
         if len(self.allDirections) == 3:
             # draw background
             drawRect(
