@@ -46,35 +46,23 @@ class Rail:
                 self.size,
                 fill="lightyellow",
             )
+            # display next rail if app.switch visualizer is on
             if app.switchVisualizer:
                 self.onPress(0)
-                self.displayHelper(app, 25)
+                type, angle = self.getTypeAngleForDisplay(self.directions, app)
+                drawImage(
+                    app.imageDict[type],
+                    worldPos[0],
+                    worldPos[1],
+                    width=self.size,
+                    height=self.size,
+                    align="center",
+                    rotateAngle=angle,
+                    opacity=25,
+                )
                 self.onPress(1)
-        self.displayHelper(app, 100)
-
-    def displayHelper(self, app, opacity):
         worldPos = mapFile.Map.toWorldPos(self.indices, app)
-
-        # determine rail display dependo on connections
-        if "top" in self.directions and "bottom" in self.directions:
-            type = "Straight"
-            angle = 0
-        elif "left" in self.directions and "right" in self.directions:
-            type = "Straight"
-            angle = 90
-        elif "top" in self.directions and "left" in self.directions:
-            type = "Turn"
-            angle = 90
-        elif "top" in self.directions and "right" in self.directions:
-            type = "Turn"
-            angle = 180
-        elif "bottom" in self.directions and "left" in self.directions:
-            type = "Turn"
-            angle = 0
-        elif "bottom" in self.directions and "right" in self.directions:
-            type = "Turn"
-            angle = 270
-
+        type, angle = self.getTypeAngleForDisplay(self.directions, app)
         drawImage(
             app.imageDict[type],
             worldPos[0],
@@ -83,17 +71,79 @@ class Rail:
             height=self.size,
             align="center",
             rotateAngle=angle,
-            opacity=opacity,
+            opacity=100,
         )
 
-    def onPress(self, button):
+    def getTypeAngleForDisplay(self, directions, app):
+        # determine rail display dependo on connections
+        if "top" in directions and "bottom" in directions:
+            type = "Straight"
+            angle = 0
+        elif "left" in directions and "right" in directions:
+            type = "Straight"
+            angle = 90
+        elif "top" in directions and "left" in directions:
+            type = "Turn"
+            angle = 90
+        elif "top" in directions and "right" in directions:
+            type = "Turn"
+            angle = 180
+        elif "bottom" in directions and "left" in directions:
+            type = "Turn"
+            angle = 0
+        elif "bottom" in directions and "right" in directions:
+            type = "Turn"
+            angle = 270
+
+        return type, angle
+
+    def onPress(self, app, button):
+        # left click automatically deselect rail
+        # if button == 0:
+        #     app.selectedRail = None
+        #     return
+
+        # only switchable rails without car can be clicked
         if len(self.allDirections) > 1 and self.cars == []:
+            # left click
             if button == 0:
                 self.dirIndex += 1
+                self.dirIndex %= len(self.allDirections)
+                self.directions = self.allDirections[self.dirIndex]
+            # right click
             else:
-                self.dirIndex -= 1
-            self.dirIndex %= len(self.allDirections)
-            self.directions = self.allDirections[self.dirIndex]
+                app.selectedRail = self
+
+    def selectedRailDisplay(self, app):
+        sizeFactor = 9 / 10
+
+        worldPos = mapFile.Map.toWorldPos(self.indices, app)
+        drawRect(
+            worldPos[0], worldPos[1], app.unitSize * 3, app.unitSize, align="bottom"
+        )
+        xOffSet = 0
+        yOffset = -app.unitSize / 2
+        for i in range(3):
+            type, angle = self.getTypeAngleForDisplay(self.allDirections[i], app)
+            xCoord = worldPos[0] + (i - 1) * self.size + xOffSet
+            yCoord = worldPos[1] + yOffset
+            drawOval(
+                xCoord,
+                yCoord,
+                self.size * sizeFactor,
+                self.size * sizeFactor,
+                fill="red",
+            )
+            drawImage(
+                app.imageDict[type],
+                xCoord,
+                yCoord,
+                width=self.size * sizeFactor,
+                height=self.size * sizeFactor,
+                align="center",
+                rotateAngle=angle,
+                opacity=100,
+            )
 
     # region rail generation
     def floodFill(self, app, prevDirection):

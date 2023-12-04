@@ -15,11 +15,16 @@ def onAppStart(app):
     mapSize = 15
     app.spawnTime = 5
     app.destinationRatio = 3
-    app.typeChoices = ["purple", "blue", "green"] # "purple", "blue", "green", "yellow", "orange", "red"
- 
+    app.typeChoices = [
+        "purple",
+        "blue",
+        "green",
+    ]  # "purple", "blue", "green", "yellow", "orange", "red"
+    app.switchVisualizer = False
+
     app.points = 0
     app.paused = False
-    app.switchVisualizer = False
+    app.selectedRail = None
 
     # create map
     app.map = Map(app.typeChoices)
@@ -75,12 +80,14 @@ def displayTopBar(app):
 
 
 def onMousePress(app, mouseX, mouseY, button):
-    app.map.findRail(app, mouseX, mouseY).onPress(button)
+    app.map.findRail(app, mouseX, mouseY).onPress(app, button)
 
 
 def onKeyPress(app, key):
     if key == "p":
         app.paused = not app.paused
+    elif key == "v":
+        app.switchVisualizer = not app.switchVisualizer
 
 
 def onStep(app):

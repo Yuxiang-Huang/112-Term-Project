@@ -31,6 +31,8 @@ class Map:
             car.display()
         for destination in self.allDestinations:
             destination.display(app)
+        if app.selectedRail != None:
+            app.selectedRail.selectedRailDisplay(app)
 
     def createMap(self, app, mapSize):
         # initlizations
