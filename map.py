@@ -72,6 +72,10 @@ class Map:
                 rail.fixOneDirectionRail(app, self.spawnableRails)
         for rowList in self.rails:
             for rail in rowList:
+                # make sure multi rails are connected
+                rail.connectMultiRail(app)
+        for rowList in self.rails:
+            for rail in rowList:
                 rail.createAllDirections()
 
         # create destinations

@@ -37,7 +37,7 @@ class Rail:
 
     def display(self, app):
         # visualize for multi rail
-        if app.switchVisualizer and len(self.allDirections) > 1:
+        if len(self.allDirections) > 1:
             worldPos = mapFile.Map.toWorldPos(self.indices, app)
             drawOval(
                 worldPos[0],
@@ -46,9 +46,10 @@ class Rail:
                 self.size,
                 fill="lightyellow",
             )
-            self.onPress(0)
-            self.displayHelper(app, 25)
-            self.onPress(1)
+            if app.switchVisualizer:
+                self.onPress(0)
+                self.displayHelper(app, 25)
+                self.onPress(1)
         self.displayHelper(app, 100)
 
     def displayHelper(self, app, opacity):
@@ -146,6 +147,19 @@ class Rail:
                 self.outOfBoundConnection(
                     self.indices[0] + dif[0], self.indices[1] + dif[1], spawnableRails
                 )
+
+    def connectMultiRail(self, app):
+        # connect to the other rail if both are multi rails
+        if len(self.directions) > 2:
+            # try left and down rails
+            for dif in [(0, 1), (1, 0)]:
+                otherIndices = (self.indices[0] + dif[0], self.indices[1] + dif[1])
+                # need to be inbound
+                if mapFile.Map.inBound(app.map, otherIndices):
+                    other = app.map.rails[otherIndices[0]][otherIndices[1]]
+                    # connect to the other rail if both are multi rails
+                    if len(other.directions) > 2:
+                        self.connectToRail(other, dif)
 
     def createAllDirections(self):
         # create all directions
