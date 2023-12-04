@@ -54,7 +54,9 @@ class Rail:
                 self.changeDirectionsHelper(1)
             # right click to select rail
             else:
-                app.selectedRail = self
+                # can't select rails with only two possible directions
+                if len(self.allDirections) > 2:
+                    app.selectedRail = self
 
     def changeDirectionsHelper(self, deltaIndex):
         # switch to next rail
