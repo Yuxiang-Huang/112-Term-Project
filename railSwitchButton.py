@@ -31,11 +31,4 @@ class RailSwitchButton:
         )
 
     def pressed(self, mouseX, mouseY):
-        return (
-            self.worldPos[0] - self.size / 2
-            <= mouseX
-            <= self.worldPos[0] + self.size / 2
-            and self.worldPos[1] - self.size / 2
-            <= mouseY
-            <= self.worldPos[1] + self.size / 2
-        )
+        return distance(self.worldPos[0], self.worldPos[1], mouseX, mouseY) <= self.size

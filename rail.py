@@ -46,13 +46,6 @@ class Rail:
         app.selectedRail = None
 
     def onPress(self, app, button):
-        # left click on not selected rails to cancel selection
-        if button == 0:
-            if app.selectedRail != None:
-                if app.selectedRail != self:
-                    app.selectedRail = None
-                    return
-
         # only switchable rails without car can be clicked
         if len(self.allDirections) > 1 and self.cars == []:
             # left click
@@ -61,9 +54,8 @@ class Rail:
                 self.dirIndex += 1
                 self.dirIndex %= len(self.allDirections)
                 self.directions = self.allDirections[self.dirIndex]
-            # right click
+            # right click to select rail
             else:
-                # remember to fix this !!!
                 app.selectedRail = self
 
     # region display
@@ -71,6 +63,7 @@ class Rail:
         self.switchButtons = []
         sizeFactor = 4 / 5
 
+        # three directions case
         if len(self.allDirections) == 3:
             # find the offset
             xOffSet = 0
@@ -98,6 +91,40 @@ class Rail:
                 type, angle = self.getTypeAngleForDisplay(self.allDirections[i])
                 xCoord = self.pos[0] + (i - 1) * self.size + xOffSet
                 yCoord = self.pos[1] + yOffset
+                self.switchButtons.append(
+                    RailSwitchButton(
+                        [xCoord, yCoord], self.size * sizeFactor, type, angle, i
+                    )
+                )
+
+        # six directions case
+        elif len(self.allDirections) == 6:
+            # find the offset
+            xOffSet = 0
+            yOffset = -app.unitSize
+
+            # no other edge cases since it requires six directions
+
+            # second row case
+            if self.indices[0] == 1:
+                yOffset = app.unitSize * 2
+
+            # store background info
+            self.switchButtonsBackgroundPos = (
+                self.pos[0] + xOffSet,
+                self.pos[1] + yOffset + app.unitSize / 2,
+            )
+
+            # create one button for each direction
+            for i in range(len(self.allDirections)):
+                type, angle = self.getTypeAngleForDisplay(self.allDirections[i])
+                xCoord = self.pos[0] + (i % 3 - 1) * self.size + xOffSet
+
+                if self.indices[0] == 1:
+                    yCoord = self.pos[1] + yOffset - app.unitSize * (1 - i // 3)
+                else:
+                    yCoord = self.pos[1] + yOffset + app.unitSize * (i // 3 - 1)
+
                 self.switchButtons.append(
                     RailSwitchButton(
                         [xCoord, yCoord], self.size * sizeFactor, type, angle, i
@@ -165,8 +192,8 @@ class Rail:
         return type, angle
 
     def selectedRailDisplay(self, app):
+        # draw background
         if len(self.allDirections) == 3:
-            # draw background
             drawRect(
                 self.switchButtonsBackgroundPos[0],
                 self.switchButtonsBackgroundPos[1],
@@ -174,10 +201,18 @@ class Rail:
                 app.unitSize,
                 align="bottom",
             )
+        elif len(self.allDirections) == 6:
+            drawRect(
+                self.switchButtonsBackgroundPos[0],
+                self.switchButtonsBackgroundPos[1],
+                app.unitSize * 3,
+                app.unitSize * 2,
+                align="bottom",
+            )
 
-            # draw rails
-            for switchButton in self.switchButtons:
-                switchButton.display(app)
+        # draw rails
+        for switchButton in self.switchButtons:
+            switchButton.display(app)
 
     # endregion
 
