@@ -7,27 +7,29 @@ from spawnManager import *
 def onAppStart(app):
     imageManager.loadImages(app)
 
-    # setting
+    # settings: free to edit
     app.stepsPerSecond = 30
-    app.speedFactor = 5
-
     mapSize = 15
-    app.spawnTime = 5
+    app.probOfStraight = 0.1
+    app.probOfExtraConnect = 0
+    app.minDifBtwDestination = 3
     app.destinationRatio = 3
     app.typeChoices = [
         "purple",
         "blue",
         "green",
     ]  # "purple", "blue", "green", "yellow", "orange", "red"
-    app.probOfStraight = 0.1
-    app.probOfExtraConnect = 0  # 0.05
-    app.minDifBtwDestination = 3
+    app.origSpeedFactor = 5
+    app.origSpawnTime = 5
 
     # in game variables
     app.points = 0
     app.paused = False
     app.selectedRail = None
     app.switchVisualizer = False
+
+    app.speedFactor = app.origSpeedFactor
+    app.spawnTime = app.origSpawnTime
 
     # create map
     app.map = Map(app.typeChoices)
@@ -95,6 +97,22 @@ def onKeyPress(app, key):
         app.paused = not app.paused
     elif key == "v":
         app.switchVisualizer = not app.switchVisualizer
+    # modify spawn time
+    elif key == "w":
+        app.spawnTime += 1
+    elif key == "s":
+        app.spawnTime -= 1
+    elif key == "e":
+        app.spawnManager.count = 0
+    # modify speed
+    elif key == "a":
+        app.speedFactor /= 2
+    elif key == "d":
+        app.speedFactor *= 2
+    # reset spawn time and speed
+    elif key == "r":
+        app.spawnTime = app.origSpawnTime
+        app.speedFactor = app.origSpeedFactor
 
 
 def onStep(app):
