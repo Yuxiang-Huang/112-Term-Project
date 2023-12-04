@@ -80,7 +80,11 @@ def displayTopBar(app):
 
 
 def onMousePress(app, mouseX, mouseY, button):
-    app.map.findRail(app, mouseX, mouseY).onPress(app, button)
+    # change rail or select rail conditions
+    if app.selectedRail == None or button != 0:
+        app.map.findRail(app, mouseX, mouseY).onPress(app, button)
+    else:
+        app.selectedRail.checkSwitchButtonPress(app, mouseX, mouseY)
 
 
 def onKeyPress(app, key):

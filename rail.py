@@ -37,21 +37,33 @@ class Rail:
     def __repr__(self):
         return f"Pos: {self.indices}, Dir: {self.allDirections}"
 
+    def checkSwitchButtonPress(self, app, mouseX, mouseY):
+        # check if any of the button can be pressed
+        for switchButton in self.switchButtons:
+            if switchButton.pressed(mouseX, mouseY):
+                # switch direction to that direction if pressed
+                self.directions = self.allDirections[switchButton.index]
+        app.selectedRail = None
+
     def onPress(self, app, button):
-        # left click automatically deselect rail
-        # if button == 0:
-        #     app.selectedRail = None
-        #     return
+        # left click on not selected rails to cancel selection
+        if button == 0:
+            if app.selectedRail != None:
+                if app.selectedRail != self:
+                    app.selectedRail = None
+                    return
 
         # only switchable rails without car can be clicked
         if len(self.allDirections) > 1 and self.cars == []:
             # left click
             if button == 0:
+                # switch to next rail
                 self.dirIndex += 1
                 self.dirIndex %= len(self.allDirections)
                 self.directions = self.allDirections[self.dirIndex]
             # right click
             else:
+                # remember to fix this !!!
                 app.selectedRail = self
 
     # region display
@@ -88,7 +100,7 @@ class Rail:
                 yCoord = self.pos[1] + yOffset
                 self.switchButtons.append(
                     RailSwitchButton(
-                        [xCoord, yCoord], self.size * sizeFactor, type, angle
+                        [xCoord, yCoord], self.size * sizeFactor, type, angle, i
                     )
                 )
 
