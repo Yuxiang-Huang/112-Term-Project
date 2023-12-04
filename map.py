@@ -79,6 +79,9 @@ class Map:
         for rowList in self.rails:
             for rail in rowList:
                 rail.createAllDirections()
+        for rowList in self.rails:
+            for rail in rowList:
+                rail.createRailSwitchButtons()
 
         # create destinations
         self.createDestinations(app, mapSize)

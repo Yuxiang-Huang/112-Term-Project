@@ -1,6 +1,7 @@
 from cmu_graphics import *
 import map as mapFile
 from destination import *
+from railSwitchButton import *
 import random
 
 
@@ -35,10 +36,68 @@ class Rail:
     def __repr__(self):
         return f"Pos: {self.indices}, Dir: {self.allDirections}"
 
+    def onPress(self, app, button):
+        # left click automatically deselect rail
+        # if button == 0:
+        #     app.selectedRail = None
+        #     return
+
+        # only switchable rails without car can be clicked
+        if len(self.allDirections) > 1 and self.cars == []:
+            # left click
+            if button == 0:
+                self.dirIndex += 1
+                self.dirIndex %= len(self.allDirections)
+                self.directions = self.allDirections[self.dirIndex]
+            # right click
+            else:
+                app.selectedRail = self
+
+    # region display
+    def createRailSwitchButtons(self):
+        self.switchButtons = []
+        sizeFactor = 4 / 5
+
+        worldPos = mapFile.Map.toWorldPos(self.indices, app)
+
+        if len(self.allDirections) == 3:
+            # find the offset
+            xOffSet = 0
+            yOffset = -app.unitSize
+            # first row case
+            if self.indices[0] == 0:
+                yOffset = app.unitSize
+
+            # first column case
+            if self.indices[1] == 0:
+                xOffSet = app.unitSize
+
+            # last column case
+            if self.indices[1] == len(app.map.rails[0]) - 1:
+                xOffSet = -app.unitSize
+
+            # store background info
+            self.switchButtonsBackgroundPos = (
+                worldPos[0] + xOffSet,
+                worldPos[1] + yOffset + app.unitSize / 2,
+            )
+
+            # create one button for each direction
+            for i in range(len(self.allDirections)):
+                type, angle = self.getTypeAngleForDisplay(self.allDirections[i])
+                xCoord = worldPos[0] + (i - 1) * self.size + xOffSet
+                yCoord = worldPos[1] + yOffset
+                self.switchButtons.append(
+                    RailSwitchButton(
+                        [xCoord, yCoord], self.size * sizeFactor, type, angle
+                    )
+                )
+
     def display(self, app):
+        worldPos = mapFile.Map.toWorldPos(self.indices, app)
         # visualize for multi rail
         if len(self.allDirections) > 1:
-            worldPos = mapFile.Map.toWorldPos(self.indices, app)
+            # draw circle background
             drawOval(
                 worldPos[0],
                 worldPos[1],
@@ -49,7 +108,7 @@ class Rail:
             # display next rail if app.switch visualizer is on
             if app.switchVisualizer:
                 self.onPress(0)
-                type, angle = self.getTypeAngleForDisplay(self.directions, app)
+                type, angle = self.getTypeAngleForDisplay(self.directions)
                 drawImage(
                     app.imageDict[type],
                     worldPos[0],
@@ -61,8 +120,7 @@ class Rail:
                     opacity=25,
                 )
                 self.onPress(1)
-        worldPos = mapFile.Map.toWorldPos(self.indices, app)
-        type, angle = self.getTypeAngleForDisplay(self.directions, app)
+        type, angle = self.getTypeAngleForDisplay(self.directions)
         drawImage(
             app.imageDict[type],
             worldPos[0],
@@ -71,10 +129,9 @@ class Rail:
             height=self.size,
             align="center",
             rotateAngle=angle,
-            opacity=100,
         )
 
-    def getTypeAngleForDisplay(self, directions, app):
+    def getTypeAngleForDisplay(self, directions):
         # determine rail display dependo on connections
         if "top" in directions and "bottom" in directions:
             type = "Straight"
@@ -97,75 +154,26 @@ class Rail:
 
         return type, angle
 
-    def onPress(self, app, button):
-        # left click automatically deselect rail
-        # if button == 0:
-        #     app.selectedRail = None
-        #     return
-
-        # only switchable rails without car can be clicked
-        if len(self.allDirections) > 1 and self.cars == []:
-            # left click
-            if button == 0:
-                self.dirIndex += 1
-                self.dirIndex %= len(self.allDirections)
-                self.directions = self.allDirections[self.dirIndex]
-            # right click
-            else:
-                app.selectedRail = self
-
     def selectedRailDisplay(self, app):
         sizeFactor = 4 / 5
 
         worldPos = mapFile.Map.toWorldPos(self.indices, app)
 
         if len(self.allDirections) == 3:
-            # find the offset
-            xOffSet = 0
-            yOffset = -app.unitSize
-            # first row case
-            if self.indices[0] == 0:
-                yOffset = app.unitSize
-
-            # first column case
-            if self.indices[1] == 0:
-                xOffSet = app.unitSize
-
-            # last column case
-            if self.indices[1] == len(app.map.rails[0]) - 1:
-                xOffSet = -app.unitSize
-
             # draw background
             drawRect(
-                worldPos[0] + xOffSet,
-                worldPos[1] + yOffset + app.unitSize / 2,
+                self.switchButtonsBackgroundPos[0],
+                self.switchButtonsBackgroundPos[1],
                 app.unitSize * 3,
                 app.unitSize,
                 align="bottom",
             )
 
             # draw rails
-            for i in range(len(self.allDirections)):
-                type, angle = self.getTypeAngleForDisplay(self.allDirections[i], app)
-                xCoord = worldPos[0] + (i - 1) * self.size + xOffSet
-                yCoord = worldPos[1] + yOffset
-                drawOval(
-                    xCoord,
-                    yCoord,
-                    self.size * sizeFactor,
-                    self.size * sizeFactor,
-                    fill="red",
-                )
-                drawImage(
-                    app.imageDict[type],
-                    xCoord,
-                    yCoord,
-                    width=self.size * sizeFactor,
-                    height=self.size * sizeFactor,
-                    align="center",
-                    rotateAngle=angle,
-                    opacity=100,
-                )
+            for switchButton in self.switchButtons:
+                switchButton.display(app)
+
+    # endregion
 
     # region rail generation
     def floodFill(self, app, prevDirection):
