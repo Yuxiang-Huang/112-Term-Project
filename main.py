@@ -10,9 +10,12 @@ def onAppStart(app):
     # settings: free to edit
     app.stepsPerSecond = 30
     mapSize = 15
+    # higher the straighter the map is
     app.probOfStraight = 0.1
+    # higher the more connections between rails in the map
     app.probOfExtraConnect = 0
     app.minDifBtwDestination = 3
+    # number of destinations for each type
     app.destinationRatio = 3
     app.typeChoices = [
         "purple",
